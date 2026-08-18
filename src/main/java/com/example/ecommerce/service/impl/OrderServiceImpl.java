@@ -368,6 +368,15 @@ public class OrderServiceImpl implements OrderService {
                 OrderStatus.CANCELLED
         );
 
+        if (order.getOrderItems() != null) {
+            for (OrderItem item : order.getOrderItems()) {
+                Product product = item.getProduct();
+                if (product != null) {
+                    product.setStock(product.getStock() + item.getQuantity());
+                    productRepository.save(product);
+                }
+            }
+        }
 
         Order updatedOrder =
                 orderRepository.save(order);
@@ -793,7 +802,6 @@ public class OrderServiceImpl implements OrderService {
     private OrderItemResponseDto mapOrderItemToResponse(
             OrderItem item) {
 
-
         BigDecimal subtotal =
                 item.getPrice()
                         .multiply(
@@ -802,24 +810,25 @@ public class OrderServiceImpl implements OrderService {
                                 )
                         );
 
-
         return new OrderItemResponseDto(
+
                 item.getId(),
 
-                item.getOrder()
-                        .getId(),
+                item.getOrder().getId(),
 
-                item.getProduct()
-                        .getId(),
+                item.getProduct().getId(),
 
-                item.getProduct()
-                        .getName(),
+                item.getProduct().getName(),
 
                 item.getQuantity(),
 
                 item.getPrice(),
 
-                subtotal
+                subtotal,
+
+                item.getCreatedAt(),
+
+                item.getUpdatedAt()
         );
     }
 }

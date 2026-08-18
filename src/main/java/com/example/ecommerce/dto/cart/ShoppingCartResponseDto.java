@@ -11,10 +11,13 @@ public record ShoppingCartResponseDto(
 
         Long customerId,
 
-        List<CartItemResponseDto> items,
+        String customerName,
+
+        List<CartItemResponseDto> cartItems,
 
         LocalDateTime createdAt,
 
         LocalDateTime updatedAt
+
 ) {
 }

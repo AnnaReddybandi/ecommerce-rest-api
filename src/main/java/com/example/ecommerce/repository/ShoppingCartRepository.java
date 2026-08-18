@@ -15,33 +15,35 @@ import java.util.Optional;
 public interface ShoppingCartRepository
         extends JpaRepository<ShoppingCart, Long> {
 
-    @Query("""
-            SELECT sc
-            FROM ShoppingCart sc
-            WHERE sc.customer.id = :customerId
-            """)
-    Optional<ShoppingCart> findByCustomerId(
-            @Param("customerId") Long customerId
-    );
+    // ============================================================
+    // FIND CART BY CUSTOMER ID
+    // ============================================================
+
+    Optional<ShoppingCart> findByCustomerId(Long customerId);
+
+
+    // ============================================================
+    // CHECK CART EXISTS FOR CUSTOMER
+    // ============================================================
+
+    boolean existsByCustomerId(Long customerId);
+
+
+    // ============================================================
+    // FIND ABANDONED CARTS
+    //
+    // A cart is considered abandoned when:
+    // 1. It has at least one cart item
+    // 2. Its updatedAt is before the given cutoff time
+    // ============================================================
 
     @Query("""
-            SELECT sc
+            SELECT DISTINCT sc
             FROM ShoppingCart sc
-            WHERE sc.updatedAt < :cutoffDate
+            JOIN sc.cartItems ci
+            WHERE sc.updatedAt < :cutoffTime
             """)
     List<ShoppingCart> findAbandonedCarts(
-            @Param("cutoffDate") LocalDateTime cutoffDate
+            @Param("cutoffTime") LocalDateTime cutoffTime
     );
-
-    @Query(
-            value = """
-                    SELECT sc.*
-                    FROM shopping_carts sc
-                    INNER JOIN cart_items ci
-                        ON sc.id = ci.cart_id
-                    GROUP BY sc.id
-                    """,
-            nativeQuery = true
-    )
-    List<ShoppingCart> findCartsWithItems();
 }

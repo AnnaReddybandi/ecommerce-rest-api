@@ -37,4 +37,7 @@ public record ProductRequestDto(
 
         String imageUrl
 ) {
+    public ProductRequestDto(String name, String description, BigDecimal price, Integer stock, ProductCategory category) {
+        this(name, description, price, stock, category, ProductStatus.ACTIVE, null);
+    }
 }

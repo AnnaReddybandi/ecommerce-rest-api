@@ -18,4 +18,7 @@ public record CheckoutRequestDto(
         String notes
 
 ) {
+    public CheckoutRequestDto(Long customerId, String shippingAddress, PaymentMethod paymentMethod) {
+        this(customerId, shippingAddress, paymentMethod, null);
+    }
 }

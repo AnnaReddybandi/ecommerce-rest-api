@@ -20,5 +20,6 @@ public record CartItemResponseDto(
         LocalDateTime createdAt,
 
         LocalDateTime updatedAt
+
 ) {
 }

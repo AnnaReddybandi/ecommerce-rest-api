@@ -5,7 +5,6 @@ import jakarta.validation.constraints.NotNull;
 
 public record OrderItemRequestDto(
 
-        @NotNull(message = "Order ID is required")
         Long orderId,
 
         @NotNull(message = "Product ID is required")
@@ -16,4 +15,7 @@ public record OrderItemRequestDto(
         Integer quantity
 
 ) {
+    public OrderItemRequestDto(Long productId, Integer quantity) {
+        this(null, productId, quantity);
+    }
 }

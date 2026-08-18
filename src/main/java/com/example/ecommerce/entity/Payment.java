@@ -55,4 +55,14 @@ public class Payment extends BaseEntity {
     private String transactionId;
 
     private String notes;
+
+    public Payment(Order order, BigDecimal amount, PaymentMethod method, PaymentStatus status, String transactionId, String notes) {
+        this.order = order;
+        this.amount = amount;
+        this.method = method != null ? method : PaymentMethod.CASH_ON_DELIVERY;
+        this.status = status != null ? status : PaymentStatus.PENDING;
+        this.transactionId = transactionId;
+        this.notes = notes;
+        this.paymentDate = LocalDateTime.now();
+    }
 }

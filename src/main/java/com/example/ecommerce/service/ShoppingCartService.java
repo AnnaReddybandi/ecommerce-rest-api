@@ -7,15 +7,36 @@ import java.util.List;
 
 public interface ShoppingCartService {
 
-    ShoppingCartResponseDto create(ShoppingCartRequestDto request);
+    // Create cart
+    ShoppingCartResponseDto create(
+            ShoppingCartRequestDto request
+    );
 
-    ShoppingCartResponseDto getById(Long id);
+    // Get cart by ID
+    ShoppingCartResponseDto getById(
+            Long id
+    );
 
+    // Get all carts
     List<ShoppingCartResponseDto> getAll();
 
-    void delete(Long id);
+    // Get cart by customer
+    ShoppingCartResponseDto getByCustomerId(
+            Long customerId
+    );
 
-    ShoppingCartResponseDto getByCustomerId(Long customerId);
+    // Delete cart
+    void delete(
+            Long id
+    );
 
-    ShoppingCartResponseDto clearCart(Long cartId);
+    // Clear cart
+    ShoppingCartResponseDto clearCart(
+            Long id
+    );
+
+    // Find abandoned carts
+    List<ShoppingCartResponseDto> findAbandonedCarts(
+            int hours
+    );
 }

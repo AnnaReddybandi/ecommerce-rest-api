@@ -69,6 +69,38 @@ public class GlobalExceptionHandler {
     }
 
     // ============================================================
+    // DUPLICATE RESOURCE
+    // ============================================================
+
+    @ExceptionHandler(DuplicateResourceException.class)
+    public ResponseEntity<Map<String, Object>> handleDuplicateResource(
+            DuplicateResourceException ex,
+            HttpServletRequest request) {
+
+        return buildResponse(
+                HttpStatus.CONFLICT,
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+    }
+
+    // ============================================================
+    // ILLEGAL STATE
+    // ============================================================
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<Map<String, Object>> handleIllegalState(
+            IllegalStateException ex,
+            HttpServletRequest request) {
+
+        return buildResponse(
+                HttpStatus.BAD_REQUEST,
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+    }
+
+    // ============================================================
     // VALIDATION ERRORS
     // ============================================================
 

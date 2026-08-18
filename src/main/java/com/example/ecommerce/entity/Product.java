@@ -76,4 +76,23 @@ public class Product extends BaseEntity {
             orphanRemoval = true
     )
     private List<CartItem> cartItems = new ArrayList<>();
+
+    public Product(String name, String description, BigDecimal price, Integer stock, ProductCategory category) {
+        this.name = name;
+        this.description = description;
+        this.price = price;
+        this.stock = stock;
+        this.category = category;
+        this.status = ProductStatus.ACTIVE;
+    }
+
+    public Product(String name, String description, BigDecimal price, Integer stock, ProductCategory category, ProductStatus status, String imageUrl) {
+        this.name = name;
+        this.description = description;
+        this.price = price;
+        this.stock = stock;
+        this.category = category;
+        this.status = status != null ? status : ProductStatus.ACTIVE;
+        this.imageUrl = imageUrl;
+    }
 }

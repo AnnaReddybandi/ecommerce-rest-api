@@ -29,6 +29,8 @@ public class CartItemController {
         this.cartItemService = cartItemService;
     }
 
+
+    //post : http://localhost:8080/api/v1/cart-items
     @PostMapping
     @Operation(summary = "Add an item to shopping cart")
     public ResponseEntity<CartItemResponseDto> create(
