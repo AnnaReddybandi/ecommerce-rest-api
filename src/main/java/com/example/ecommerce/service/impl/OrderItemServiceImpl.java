@@ -42,6 +42,10 @@ public class OrderItemServiceImpl
     public OrderItemResponseDto create(
             OrderItemRequestDto request) {
 
+        if (request.orderId() == null) {
+            throw new IllegalArgumentException("Order ID is required");
+        }
+
         log.info(
                 "Creating order item for order ID: {}",
                 request.orderId()

@@ -29,6 +29,17 @@ public class CustomerController {
         this.customerService = customerService;
     }
 
+
+
+    // post : http://localhost:8080/api/v1/customers
+      /*
+      {
+  "name": "Mohan",
+  "email": "mohan.reddy@example.com",
+  "phone": "9876543212",
+  "address": "gayee Tech Park, Bangalore, India"
+}
+       */
     @PostMapping
     @Operation(summary = "Create a new customer")
     public ResponseEntity<CustomerResponseDto> create(
@@ -39,6 +50,10 @@ public class CustomerController {
                 .body(customerService.create(request));
     }
 
+
+
+    // get :  http://localhost:8080/api/v1/customers
+
     @GetMapping
     @Operation(summary = "Get all customers")
     public ResponseEntity<List<CustomerResponseDto>> getAll() {
@@ -47,6 +62,9 @@ public class CustomerController {
                 customerService.getAll()
         );
     }
+
+
+    //get : http://localhost:8080/api/v1/customers/1
 
     @GetMapping("/{id}")
     @Operation(summary = "Get customer by ID")
@@ -58,6 +76,16 @@ public class CustomerController {
         );
     }
 
+    // put : http://localhost:8080/api/v1/customers/1
+    /*
+    {
+  "name": "Mohan up",
+  "email": "mohan1.reddy@example.com",
+  "phone": "9876543212",
+  "address": "gayee Tech Park, Bangalore, India"
+}
+
+     */
     @PutMapping("/{id}")
     @Operation(summary = "Update customer details")
     public ResponseEntity<CustomerResponseDto> update(
@@ -68,6 +96,9 @@ public class CustomerController {
                 customerService.update(id, request)
         );
     }
+
+
+    //delete :  http://localhost:8080/api/v1/customers/1
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete customer by ID")

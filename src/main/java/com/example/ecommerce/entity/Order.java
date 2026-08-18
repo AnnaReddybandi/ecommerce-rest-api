@@ -62,4 +62,20 @@ public class Order extends BaseEntity {
             orphanRemoval = true
     )
     private Payment payment;
+
+    public Order(Customer customer, String shippingAddress, BigDecimal totalAmount) {
+        this.customer = customer;
+        this.shippingAddress = shippingAddress;
+        this.totalAmount = totalAmount;
+        this.orderDate = LocalDateTime.now();
+        this.status = OrderStatus.PENDING;
+    }
+
+    public Order(Customer customer, String shippingAddress, BigDecimal totalAmount, OrderStatus status) {
+        this.customer = customer;
+        this.shippingAddress = shippingAddress;
+        this.totalAmount = totalAmount;
+        this.orderDate = LocalDateTime.now();
+        this.status = status != null ? status : OrderStatus.PENDING;
+    }
 }

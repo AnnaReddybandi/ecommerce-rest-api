@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 
 public record CartItemRequestDto(
 
-        @NotNull(message = "Shopping cart ID is required")
+        @NotNull(message = "Cart ID is required")
         Long cartId,
 
         @NotNull(message = "Product ID is required")
@@ -17,5 +17,6 @@ public record CartItemRequestDto(
                 message = "Quantity must be at least 1"
         )
         Integer quantity
+
 ) {
 }

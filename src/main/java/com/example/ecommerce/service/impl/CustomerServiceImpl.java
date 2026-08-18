@@ -3,6 +3,7 @@ package com.example.ecommerce.service.impl;
 import com.example.ecommerce.dto.customer.CustomerRequestDto;
 import com.example.ecommerce.dto.customer.CustomerResponseDto;
 import com.example.ecommerce.entity.Customer;
+import com.example.ecommerce.exception.DuplicateResourceException;
 import com.example.ecommerce.exception.ResourceNotFoundException;
 import com.example.ecommerce.repository.CustomerRepository;
 import com.example.ecommerce.service.CustomerService;
@@ -33,7 +34,7 @@ public class CustomerServiceImpl implements CustomerService {
         log.info("Creating customer with email: {}", request.email());
 
         if (customerRepository.findByEmail(request.email()).isPresent()) {
-            throw new IllegalArgumentException(
+            throw new DuplicateResourceException(
                     "Customer already exists with email: " + request.email()
             );
         }
