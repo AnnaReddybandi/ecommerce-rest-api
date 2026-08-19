@@ -113,7 +113,7 @@ public class CustomerServiceImpl implements CustomerService {
         customerRepository.findByEmail(request.email())
                 .ifPresent(existing -> {
                     if (!existing.getId().equals(id)) {
-                        throw new IllegalArgumentException(
+                        throw new DuplicateResourceException(
                                 "Email already exists: " + request.email()
                         );
                     }

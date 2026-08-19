@@ -1,7 +1,7 @@
 package com.example.ecommerce.dto.product;
 
-import com.example.ecommerce.entity.ProductCategory;
-import com.example.ecommerce.entity.ProductStatus;
+import com.example.ecommerce.entity.enums.ProductCategory;
+import com.example.ecommerce.entity.enums.ProductStatus;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;

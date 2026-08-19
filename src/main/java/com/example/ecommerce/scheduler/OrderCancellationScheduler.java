@@ -1,11 +1,8 @@
 package com.example.ecommerce.scheduler;
 
 import com.example.ecommerce.entity.Order;
-import com.example.ecommerce.entity.OrderItem;
-import com.example.ecommerce.entity.OrderStatus;
-import com.example.ecommerce.entity.Product;
+import com.example.ecommerce.entity.enums.OrderStatus;
 import com.example.ecommerce.repository.OrderRepository;
-import com.example.ecommerce.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -21,7 +18,6 @@ import java.util.List;
 public class OrderCancellationScheduler {
 
     private final OrderRepository orderRepository;
-    private final ProductRepository productRepository;
 
     /**
      * Cancels pending orders older than 30 minutes.
@@ -50,16 +46,6 @@ public class OrderCancellationScheduler {
         for (Order order : expiredOrders) {
 
             order.setStatus(OrderStatus.CANCELLED);
-
-            if (order.getOrderItems() != null) {
-                for (OrderItem item : order.getOrderItems()) {
-                    Product product = item.getProduct();
-                    if (product != null) {
-                        product.setStock(product.getStock() + item.getQuantity());
-                        productRepository.save(product);
-                    }
-                }
-            }
 
             log.info(
                     "Order {} automatically cancelled because it was pending before {}",

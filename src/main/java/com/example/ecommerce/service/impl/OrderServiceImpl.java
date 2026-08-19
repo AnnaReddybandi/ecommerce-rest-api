@@ -9,17 +9,18 @@ import com.example.ecommerce.entity.CartItem;
 import com.example.ecommerce.entity.Customer;
 import com.example.ecommerce.entity.Order;
 import com.example.ecommerce.entity.OrderItem;
-import com.example.ecommerce.entity.OrderStatus;
+import com.example.ecommerce.entity.enums.OrderStatus;
 import com.example.ecommerce.entity.Payment;
-import com.example.ecommerce.entity.PaymentMethod;
-import com.example.ecommerce.entity.PaymentStatus;
+import com.example.ecommerce.entity.enums.PaymentMethod;
+import com.example.ecommerce.entity.enums.PaymentStatus;
 import com.example.ecommerce.entity.Product;
-import com.example.ecommerce.entity.ProductStatus;
 import com.example.ecommerce.entity.ShoppingCart;
+import com.example.ecommerce.entity.enums.ProductStatus;
+import com.example.ecommerce.exception.InsufficientStockException;
+import com.example.ecommerce.exception.InvalidOrderException;
 import com.example.ecommerce.exception.ResourceNotFoundException;
 import com.example.ecommerce.repository.CartItemRepository;
 import com.example.ecommerce.repository.CustomerRepository;
-import com.example.ecommerce.repository.OrderItemRepository;
 import com.example.ecommerce.repository.OrderRepository;
 import com.example.ecommerce.repository.PaymentRepository;
 import com.example.ecommerce.repository.ProductRepository;
@@ -312,7 +313,7 @@ public class OrderServiceImpl implements OrderService {
 
         if (order.getStatus() != OrderStatus.PENDING) {
 
-            throw new IllegalStateException(
+            throw new InvalidOrderException(
                     "Only pending orders can be confirmed"
             );
         }
@@ -350,7 +351,7 @@ public class OrderServiceImpl implements OrderService {
 
         if (order.getStatus() == OrderStatus.DELIVERED) {
 
-            throw new IllegalStateException(
+            throw new InvalidOrderException(
                     "Delivered order cannot be cancelled"
             );
         }
@@ -358,7 +359,7 @@ public class OrderServiceImpl implements OrderService {
 
         if (order.getStatus() == OrderStatus.CANCELLED) {
 
-            throw new IllegalStateException(
+            throw new InvalidOrderException(
                     "Order is already cancelled"
             );
         }
@@ -706,7 +707,7 @@ public class OrderServiceImpl implements OrderService {
 
         if (product.getStock() < quantity) {
 
-            throw new IllegalStateException(
+            throw new InsufficientStockException(
                     "Insufficient stock for product: "
                             + product.getName()
             );

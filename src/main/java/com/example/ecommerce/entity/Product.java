@@ -1,5 +1,7 @@
 package com.example.ecommerce.entity;
 
+import com.example.ecommerce.entity.enums.ProductCategory;
+import com.example.ecommerce.entity.enums.ProductStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -22,8 +24,7 @@ import java.util.List;
                 SELECT p
                 FROM Product p
                 WHERE p.category = :category
-                AND p.status =
-                com.example.ecommerce.entity.ProductStatus.ACTIVE
+                AND p.status = 'ACTIVE'
                 """
 )
 @Getter

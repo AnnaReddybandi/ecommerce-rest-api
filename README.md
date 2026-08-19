@@ -1,94 +1,121 @@
 # E-commerce REST API
-A complete **E-commerce REST API** built using **Java, Spring Boot, Spring Data JPA, MySQL and REST principles**.
 
-This project is designed as a learning and reference project covering real-world backend development concepts such as:
+A complete **E-commerce REST API** built using **Java, Spring Boot, Spring Data JPA, Hibernate, MySQL and REST principles**.
 
-- Proper package structure
-- REST API development
-- Entity relationships
-- DTO pattern
-- Request DTO / Response DTO
-- Validation
-- JPQL queries
-- Native SQL queries
-- Named queries
-- Enum classes
-- Custom exceptions
-- Global exception handling
-- JPA auditing
-- Transaction management
-- Scheduler
-- Swagger / OpenAPI
-- Logging
-- API versioning
-- Spring Boot Actuator
-- Lombok
-- Product image upload
-- MySQL
-- Complete CRUD operations
+This project demonstrates real-world backend development concepts including:
+
+* REST API development
+* Layered architecture
+* Entity relationships
+* DTO pattern
+* Request DTO / Response DTO
+* Jakarta Validation
+* JPQL queries
+* Native SQL queries
+* Named queries
+* Enum classes
+* Custom exceptions
+* Global exception handling
+* JPA auditing
+* Transaction management
+* Scheduler
+* Swagger / OpenAPI
+* Logging
+* API versioning
+* Spring Boot Actuator
+* Lombok
+* Product image upload
+* MySQL
+* Complete CRUD operations
+* Shopping cart and checkout workflow
+* Payment management
 
 ---
 
 # 1. Project Overview
 
 ## Project Name
+
 **E-commerce REST API**
 
 ## Technology Stack
 
-| Technology | Version / Usage |
-|---|---|
-| Java | 17 |
-| Spring Boot | 3.5.3 |
-| Spring Web | REST API |
-| Spring Data JPA | Database operations |
-| Hibernate | ORM |
-| MySQL | Relational database |
-| Maven | Build management |
-| Lombok | Boilerplate reduction |
-| Jakarta Validation | Request validation |
-| Swagger / OpenAPI | API documentation |
-| Spring Boot Actuator | Application monitoring |
-| SLF4J | Logging |
-| JPA Auditing | createdAt / updatedAt |
+| Technology           | Version / Usage           |
+| -------------------- | ------------------------- |
+| Java                 | 25                        |
+| Spring Boot          | 3.4.13                    |
+| Spring Web           | REST API                  |
+| Spring Data JPA      | Database operations       |
+| Hibernate            | ORM                       |
+| MySQL                | Relational database       |
+| Maven                | Build management          |
+| Lombok               | 1.18.38                   |
+| Jakarta Validation   | Request validation        |
+| Swagger / OpenAPI    | 2.8.17 (SpringDoc)        |
+| Spring Boot Actuator | Application monitoring    |
+| Spring Boot DevTools | Hot reload (development)  |
+| SLF4J                | Logging                   |
+| JPA Auditing         | `createdAt` / `updatedAt` |
 
 ---
 
 # 2. Business Context
-This REST API is designed for an e-commerce platform.
+
+This REST API represents the backend of an e-commerce platform.
 
 The application manages:
 
-- Customers
-- Products
-- Orders
-- Order Items
-- Shopping Carts
-- Cart Items
-- Payments
+* Customers
+* Products
+* Shopping Carts
+* Cart Items
+* Orders
+* Order Items
+* Payments
 
-Customers can register and manage their accounts. Products can be added, updated and managed by administrators. Customers can place orders containing multiple products. Customers can add products to shopping carts before checkout. Payments are associated with orders and tracked through the payment module.
+The primary business flow is:
 
-The API is designed so that it can later be integrated with a frontend application such as:
+```text
+Customer
+   ↓
+Product
+   ↓
+Shopping Cart
+   ↓
+Cart Item
+   ↓
+Checkout
+   ↓
+Order
+   ↓
+Order Items
+   ↓
+Payment
+   ↓
+Order Confirmation
+```
 
-- React
-- Angular
-- Vue
-- Mobile applications
-- Other REST API consumers
+The API can later be integrated with:
+
+* React
+* Angular
+* Vue
+* Android / iOS applications
+* Other REST API consumers
 
 ---
 
 # 3. Main Modules
-The project contains seven main database modules.
 
-```
+The project contains seven major database modules:
+
+```text
 1. Customer
 2. Product
-3. Order
-4. OrderItem
-5. ShoppingCart
-6. CartItem
+3. ShoppingCart
+4. CartItem
+5. Order
+6. OrderItem
 7. Payment
 ```
 
@@ -98,82 +125,46 @@ The project contains seven main database modules.
 
 ## 4.1 Customers
 
-```
+```text
 customers
 ------------------------------------------------
 id              BIGINT PRIMARY KEY
-name            VARCHAR
+name            VARCHAR(100)
 email           VARCHAR
-phone           VARCHAR
-address         VARCHAR
+phone           VARCHAR(20)
+address         VARCHAR(255)
 created_at      DATETIME
+updated_at      DATETIME
 ```
 
-**Purpose:** Stores customer information.
+Stores customer information.
 
 ---
 
 ## 4.2 Products
 
-```
+```text
 products
 ------------------------------------------------
 id              BIGINT PRIMARY KEY
-name            VARCHAR
-description     VARCHAR
-price           DECIMAL
+name            VARCHAR(255)
+description     VARCHAR(1000)
+price           DECIMAL(10,2)
 stock           INTEGER
 category        VARCHAR
+status          VARCHAR
+image_url       VARCHAR
+created_at      DATETIME
+updated_at      DATETIME
 ```
 
-**Purpose:** Stores products available in the e-commerce system.
+Stores products available in the e-commerce system.
 
 ---
 
-## 4.3 Orders
+## 4.3 Shopping Carts
 
-```
-orders
-------------------------------------------------
-id                  BIGINT PRIMARY KEY
-customer_id         BIGINT FOREIGN KEY
-order_date          DATETIME
-status              VARCHAR
-shipping_address    VARCHAR
-total_amount        DECIMAL
-```
-
-**Purpose:** Stores customer orders.
-
----
-
-## 4.4 Order Items
-
-```
-order_items
-------------------------------------------------
-id              BIGINT PRIMARY KEY
-order_id        BIGINT FOREIGN KEY
-product_id      BIGINT FOREIGN KEY
-quantity        INTEGER
-price           DECIMAL
-```
-
-**Purpose:** Stores individual products belonging to an order.
-
-Example:
-```
-Order #1001
-
-Product A → quantity 2 → price 500
-Product B → quantity 1 → price 1000
-```
-
----
-
-## 4.5 Shopping Carts
-
-```
+```text
 shopping_carts
 ------------------------------------------------
 id              BIGINT PRIMARY KEY
@@ -182,231 +173,177 @@ created_at      DATETIME
 updated_at      DATETIME
 ```
 
-**Purpose:** Stores customer shopping carts.
+Stores shopping carts belonging to customers.
 
 ---
 
-## 4.6 Cart Items
+## 4.4 Cart Items
 
-```
+```text
 cart_items
 ------------------------------------------------
 id              BIGINT PRIMARY KEY
 cart_id         BIGINT FOREIGN KEY
 product_id      BIGINT FOREIGN KEY
 quantity        INTEGER
+created_at      DATETIME
+updated_at      DATETIME
 ```
 
-**Purpose:** Stores products added to a shopping cart.
+Stores products added to shopping carts.
+
+---
+
+## 4.5 Orders
+
+```text
+orders
+------------------------------------------------
+id                  BIGINT PRIMARY KEY
+customer_id         BIGINT FOREIGN KEY
+order_date          DATETIME
+status              VARCHAR
+shipping_address    VARCHAR(255)
+total_amount        DECIMAL(10,2)
+created_at          DATETIME
+updated_at          DATETIME
+```
+
+Stores customer orders.
+
+---
+
+## 4.6 Order Items
+
+```text
+order_items
+------------------------------------------------
+id              BIGINT PRIMARY KEY
+order_id        BIGINT FOREIGN KEY
+product_id      BIGINT FOREIGN KEY
+quantity        INTEGER
+price           DECIMAL(10,2)
+created_at      DATETIME
+updated_at      DATETIME
+```
+
+Stores individual products belonging to an order.
+
+Example:
+
+```text
+Order #1001
+
+Product A → quantity 2 → price ₹500
+Product B → quantity 1 → price ₹1000
+```
+
+Total:
+
+```text
+2 × ₹500 + 1 × ₹1000 = ₹2000
+```
 
 ---
 
 ## 4.7 Payments
 
-```
+```text
 payments
 ------------------------------------------------
 id              BIGINT PRIMARY KEY
 order_id        BIGINT FOREIGN KEY
 payment_date    DATETIME
-amount          DECIMAL
+amount          DECIMAL(10,2)
 method          VARCHAR
 status          VARCHAR
+transaction_id  VARCHAR
+notes           VARCHAR
+created_at      DATETIME
+updated_at      DATETIME
 ```
 
-**Purpose:** Stores payment information associated with an order.
+Stores payment information associated with orders.
 
 ---
 
 # 5. Entity Relationships
 
-## Customer → Orders
-One customer can have multiple orders.
-
-```
+```text
 Customer
-    |
-    | 1
-    |
-    | *
-    ↓
-Orders
+   │
+   ├───────────────< Order
+   │                    │
+   │                    ├──────< OrderItem >──── Product
+   │                    │
+   │                    └────── Payment
+   │
+   └───────────────< ShoppingCart
+                        │
+                        └──────< CartItem >──── Product
 ```
 
-JPA:
-```java
-@OneToMany(mappedBy = "customer")
-private List<Order> orders;
+## Relationships
+
+### Customer → Order
+
+```text
+Customer 1 ─────── * Order
 ```
 
----
+### Customer → ShoppingCart
 
-## Order → Order Items
-One order can contain multiple order items.
-
-```
-Order
-    |
-    | 1
-    |
-    | *
-    ↓
-OrderItem
+```text
+Customer 1 ─────── * ShoppingCart
 ```
 
----
+### ShoppingCart → CartItem
 
-## Product → Order Items
-One product can appear in multiple order items.
-
+```text
+ShoppingCart 1 ─────── * CartItem
 ```
-Product
-    |
-    | 1
-    |
-    | *
-    ↓
-OrderItem
+
+### Product → CartItem
+
+```text
+Product 1 ─────── * CartItem
+```
+
+### Order → OrderItem
+
+```text
+Order 1 ─────── * OrderItem
+```
+
+### Product → OrderItem
+
+```text
+Product 1 ─────── * OrderItem
 ```
 
 Therefore:
-```
-Orders
-   ↕
-OrderItems
-   ↕
-Products
+
+```text
+Order ↔ Product
 ```
 
-This represents a Many-to-Many relationship: `Orders ↔ Products` through `OrderItems`.
+is effectively a many-to-many relationship through `OrderItem`.
 
----
+### Order → Payment
 
-## Customer → Shopping Cart
-A customer can have shopping carts.
-
-```
-Customer
-    |
-    | 1
-    |
-    | *
-    ↓
-ShoppingCart
+```text
+Order 1 ─────── 1 Payment
 ```
 
 ---
 
-## Shopping Cart → Cart Items
-A shopping cart contains multiple cart items.
+# 6. Project Architecture
 
-```
-ShoppingCart
-      |
-      | 1
-      |
-      | *
-      ↓
-CartItem
-```
+The application follows a layered architecture.
 
----
+## Request Flow
 
-## Product → Cart Items
-A product can appear in multiple cart items.
-
-Therefore:
-```
-ShoppingCart
-      ↕
-   CartItem
-      ↕
-    Product
-```
-
-This represents a Many-to-Many relationship: `ShoppingCart ↔ Product` through `CartItem`.
-
----
-
-## Order → Payment
-Each order has one payment.
-
-```
-Order
-  |
-  | 1 : 1
-  |
-  ↓
-Payment
-```
-
----
-
-# 6. Complete Relationship Diagram
-
-```
-                     ┌───────────────┐
-                     │   Customers   │
-                     └───────┬───────┘
-                             │
-                          1  │
-                             │ *
-                     ┌───────▼───────┐
-                     │     Orders    │
-                     └───────┬───────┘
-                             │
-                          1  │
-                             │ *
-                     ┌───────▼───────┐
-                     │  OrderItems   │
-                     └───────┬───────┘
-                             │
-                          *  │
-                             │ 1
-                     ┌───────▼───────┐
-                     │    Products   │
-                     └───────────────┘
-
-                     ┌───────────────┐
-                     │   Customers   │
-                     └───────┬───────┘
-                             │
-                          1  │
-                             │ *
-                     ┌───────▼───────┐
-                     │ ShoppingCart  │
-                     └───────┬───────┘
-                             │
-                          1  │
-                             │ *
-                     ┌───────▼───────┐
-                     │   CartItem    │
-                     └───────┬───────┘
-                             │
-                          *  │
-                             │ 1
-                     ┌───────▼───────┐
-                     │    Products   │
-                     └───────────────┘
-
-                     ┌───────────────┐
-                     │     Orders    │
-                     └───────┬───────┘
-                             │
-                          1  │
-                             │ 1
-                     ┌───────▼───────┐
-                     │    Payments   │
-                     └───────────────┘
-```
-
----
-
-# 7. Project Architecture
-The application follows a layered architecture:
-
-**Request Flow:**
-```
+```text
 Client
   ↓
 Controller
@@ -419,12 +356,13 @@ Repository
   ↓
 Entity
   ↓
-Database
+MySQL
 ```
 
-**Response Flow:**
-```
-Database
+## Response Flow
+
+```text
+MySQL
   ↓
 Entity
   ↓
@@ -439,9 +377,9 @@ Client
 
 ---
 
-# 8. Complete Package Structure
+# 7. Package Structure
 
-```
+```text
 com.example.ecommerce
 │
 ├── EcommerceApplication.java
@@ -460,10 +398,9 @@ com.example.ecommerce
 │   │   └── PaymentController.java
 │   │
 │   └── v2
-│       └── ProductControllerV2.java
+│       └── ProductV2Controller.java
 │
 ├── dto
-│   │
 │   ├── customer
 │   │   ├── CustomerRequestDto.java
 │   │   └── CustomerResponseDto.java
@@ -474,7 +411,8 @@ com.example.ecommerce
 │   │
 │   ├── order
 │   │   ├── OrderRequestDto.java
-│   │   └── OrderResponseDto.java
+│   │   ├── OrderResponseDto.java
+│   │   └── CheckoutRequestDto.java
 │   │
 │   ├── orderitem
 │   │   ├── OrderItemRequestDto.java
@@ -503,6 +441,7 @@ com.example.ecommerce
 │   ├── Payment.java
 │   │
 │   ├── ProductCategory.java
+│   ├── ProductStatus.java
 │   ├── OrderStatus.java
 │   ├── PaymentMethod.java
 │   └── PaymentStatus.java
@@ -552,156 +491,188 @@ com.example.ecommerce
 
 ---
 
-# 9. Maven Dependencies
+# 8. Maven Dependencies
 
-```xml
+The project uses:
+
+```text
 spring-boot-starter-web
 spring-boot-starter-data-jpa
 spring-boot-starter-validation
 spring-boot-starter-actuator
 mysql-connector-j
-springdoc-openapi-starter-webmvc-ui
-lombok
+springdoc-openapi-starter-webmvc-ui (2.8.17)
+lombok (1.18.38)
+spring-boot-devtools (runtime, optional)
+h2 (test scope)
 spring-boot-starter-test
 ```
 
 ---
 
-# 10. Database Configuration
+# 9. Database Configuration
 
-**Database name:** `ecommerce_db`
+Database:
 
-**Configuration:**
+```text
+ecommerce_db
+```
+
+Create it using:
+
+```sql
+CREATE DATABASE ecommerce_db;
+```
+
+Verify:
+
+```sql
+SHOW DATABASES;
+```
+
+Select:
+
+```sql
+USE ecommerce_db;
+```
+
+Example configuration:
+
 ```yaml
 spring:
   datasource:
     url: jdbc:mysql://localhost:3306/ecommerce_db
     username: root
     password: root
-```
 
-Change the username and password according to your local MySQL installation.
-
----
-
-# 11. Create Database
-
-Run:
-```sql
-CREATE DATABASE ecommerce_db;
-```
-
-Verify:
-```sql
-SHOW DATABASES;
-```
-
-Then:
-```sql
-USE ecommerce_db;
-```
-
----
-
-# 12. JPA Configuration
-
-```yaml
-spring:
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: false
 ```
 
-During development, `ddl-auto: update` can be used to automatically update the schema. For production systems, database migration tools such as Flyway or Liquibase should be considered.
+Change the username and password according to your local MySQL installation.
 
 ---
 
-# 13. Enum Classes
-The project uses enums instead of storing arbitrary strings throughout business logic.
+# 10. Base Entity and Auditing
+
+All major entities extend:
+
+```java
+BaseEntity
+```
+
+The base entity contains:
+
+```text
+id
+createdAt
+updatedAt
+```
+
+JPA auditing is enabled using:
+
+```java
+@EnableJpaAuditing
+```
+
+The application uses:
+
+```java
+@CreatedDate
+@LastModifiedDate
+```
+
+to automatically maintain audit timestamps.
+
+---
+
+# 11. Enum Classes
 
 ## ProductCategory
 
-```java
-public enum ProductCategory {
-    ELECTRONICS,
-    FASHION,
-    HOME,
-    BOOKS,
-    BEAUTY,
-    SPORTS,
-    GROCERY
-}
+```text
+ELECTRONICS
+FASHION
+HOME
+BOOKS
+BEAUTY
+SPORTS
+GROCERY
+```
+
+## ProductStatus
+
+```text
+ACTIVE
+INACTIVE
 ```
 
 ## OrderStatus
 
-```java
-public enum OrderStatus {
-    PENDING,
-    CONFIRMED,
-    SHIPPED,
-    DELIVERED,
-    CANCELLED
-}
+```text
+PENDING
+CONFIRMED
+SHIPPED
+DELIVERED
+CANCELLED
 ```
 
 ## PaymentMethod
 
-```java
-public enum PaymentMethod {
-    CASH_ON_DELIVERY,
-    CARD,
-    UPI,
-    NET_BANKING
-}
+```text
+CASH_ON_DELIVERY
+CARD
+UPI
+NET_BANKING
 ```
 
 ## PaymentStatus
 
-```java
-public enum PaymentStatus {
-    PENDING,
-    SUCCESS,
-    FAILED,
-    REFUNDED
-}
+```text
+PENDING
+SUCCESS
+FAILED
+REFUNDED
 ```
-
-Enums improve consistency and reduce invalid status values.
 
 ---
 
-# 14. DTO Architecture
-Entities should not be directly exposed through REST APIs. The application uses:
+# 12. DTO Architecture
 
-**Request Flow:**
-```
+Entities are not directly exposed through REST APIs.
+
+## Request
+
+```text
+Client
+  ↓
 Request DTO
-     ↓
+  ↓
 Controller
-     ↓
+  ↓
 Service
-     ↓
+  ↓
 Entity
 ```
 
-**Response Flow:**
-```
+## Response
+
+```text
 Entity
-   ↓
+  ↓
 Service
-   ↓
+  ↓
 Response DTO
-   ↓
+  ↓
 Controller
+  ↓
+Client
 ```
-
----
-
-# 15. Request DTO
 
 Example:
+
 ```java
 public record ProductRequestDto(
     String name,
@@ -712,13 +683,8 @@ public record ProductRequestDto(
 ) {}
 ```
 
-The Request DTO represents data received from the client.
+Response:
 
----
-
-# 16. Response DTO
-
-Example:
 ```java
 public record ProductResponseDto(
     Long id,
@@ -730,585 +696,108 @@ public record ProductResponseDto(
 ) {}
 ```
 
-The Response DTO represents data returned to the client.
-
 ---
 
-# 17. Validation
-Validation is performed using Jakarta Validation.
+# 13. Validation
 
-Example:
+The application uses Jakarta Validation.
+
+Examples:
+
 ```java
-@NotBlank(message = "Product name is required")
-private String name;
-
-@NotNull(message = "Price is required")
-@DecimalMin(value = "0.01")
-private BigDecimal price;
-
-@NotNull(message = "Stock is required")
-@Min(value = 0)
-private Integer stock;
+@NotBlank
+@NotNull
+@Email
+@Pattern
+@Min
+@DecimalMin
 ```
 
-Controller:
+Controllers use:
+
 ```java
-@PostMapping
-public ResponseEntity<ProductResponseDto> create(
-        @Valid @RequestBody ProductRequestDto request) {
-    return ResponseEntity
-            .status(HttpStatus.CREATED)
-            .body(service.create(request));
+@Valid
+@RequestBody
+```
+
+Example:
+
+```json
+{
+  "name": "",
+  "price": -100,
+  "stock": -5
 }
 ```
 
+Expected response:
+
+```text
+400 Bad Request
+```
+
 ---
 
-# 18. Custom Exceptions
+# 14. Custom Exceptions
+
+The project contains:
 
 ### ResourceNotFoundException
-Used when a requested resource does not exist.
 
-Example: `Customer with ID 100 not found`
+Used when a resource does not exist.
+
+Example:
+
+```text
+Product with ID 100 not found
+```
 
 ### DuplicateResourceException
-Used when a duplicate resource is detected.
 
-Example: `Customer email already exists`
+Used for duplicate resources.
+
+Example:
+
+```text
+Customer email already exists
+```
 
 ### InsufficientStockException
-Used when an order requests more products than the available stock.
 
-Example: `Insufficient stock for product 10`
+Used when requested quantity exceeds available stock.
 
 ### InvalidOrderException
+
 Used for invalid order operations.
 
-Example: `Cannot cancel a delivered order`
-
----
-
-# 19. Global Exception Handling
-The application uses `@RestControllerAdvice` for centralized exception handling. The central exception handler handles:
-
-- 400 Bad Request
-- 404 Not Found
-- 409 Conflict
-- 500 Internal Server Error
-
-Validation errors are returned as field-level errors.
-
 Example:
-```json
-{
-  "timestamp": "2026-08-17T10:30:00",
-  "status": 400,
-  "error": "Bad Request",
-  "message": "Validation failed",
-  "path": "/api/v1/products",
-  "validationErrors": {
-    "name": "Product name is required",
-    "price": "Price must be greater than zero"
-  }
-}
+
+```text
+Cannot cancel a delivered order
 ```
 
 ---
 
-# 20. Repository Layer
-Repositories extend `JpaRepository<Entity, Long>`.
+# 15. Global Exception Handling
 
-Example:
-```java
-public interface ProductRepository
-        extends JpaRepository<Product, Long> {
-}
-```
-
-Spring Data JPA automatically provides:
-```
-save()
-findAll()
-findById()
-delete()
-deleteById()
-count()
-existsById()
-```
-
----
-
-# 21. JPQL Queries
-JPQL operates on entities and entity fields.
-
-Example:
-```java
-@Query("""
-    SELECT p
-    FROM Product p
-    WHERE p.price BETWEEN :min AND :max
-    AND p.status = :status
-""")
-List<Product> findByPriceRange(
-        @Param("min") BigDecimal min,
-        @Param("max") BigDecimal max,
-        @Param("status") ProductStatus status
-);
-```
-
-**Important:** JPQL uses entity names (`Product`, `p.price`, `p.status`) rather than database table names.
-
----
-
-# 22. Native SQL Queries
-Native queries use actual database SQL.
-
-Example:
-```java
-@Query(
-    value = "SELECT * FROM products WHERE stock > :minimumStock",
-    nativeQuery = true
-)
-List<Product> findProductsWithStock(
-        @Param("minimumStock") int minimumStock
-);
-```
-
-Here, `products` and `stock` are actual database table/column names.
-
----
-
-# 23. Named Queries
-Named queries are defined on entities.
-
-Example:
-```java
-@NamedQuery(
-    name = "Product.findActiveByCategoryNamed",
-    query = """
-        SELECT p
-        FROM Product p
-        WHERE p.category = :category
-        AND p.status = 'ACTIVE'
-    """
-)
-```
-
-Repository:
-```java
-List<Product> findActiveByCategoryNamed(
-        @Param("category") ProductCategory category
-);
-```
-
-The project demonstrates all three query styles: JPQL, Native SQL, and Named Query.
-
----
-
-# 24. Auditing
-JPA auditing automatically maintains `createdAt` and `updatedAt` fields.
-
-Base entity:
-```java
-@MappedSuperclass
-@EntityListeners(AuditingEntityListener.class)
-public abstract class BaseEntity {
-    @CreatedDate
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
-}
-```
-
-Application setup:
-```java
-@EnableJpaAuditing
-```
-
----
-
-# 25. Transaction Management
-Transactions are especially important during checkout. Example business process:
-
-```
-Create Order
-     ↓
-Create OrderItem
-     ↓
-Check Product Stock
-     ↓
-Reduce Product Stock
-     ↓
-Calculate Total
-     ↓
-Create Payment
-```
-
-All operations should be treated as one business transaction:
+The application uses:
 
 ```java
-@Transactional
-public OrderResponseDto checkout(...) {
-    // order creation
-    // order item creation
-    // stock update
-    // payment creation
-}
+@RestControllerAdvice
 ```
 
-If an operation fails, the entire transaction is **ROLLED BACK**, preventing partially completed orders.
+to centrally handle exceptions.
 
----
+Supported responses include:
 
-# 26. Scheduler
-The application uses Spring Scheduling.
-
-Enable:
-```java
-@EnableScheduling
+```text
+400 Bad Request
+404 Not Found
+409 Conflict
+500 Internal Server Error
 ```
 
 Example:
-```java
-@Scheduled(fixedRate = 300000)
-public void cancelExpiredOrders() {
-    // find old pending orders
-    // change status to CANCELLED
-}
-```
-
-The scheduler can be used for:
-
-### Pending Order Cleanup
-```
-PENDING → Older than configured time → CANCELLED
-```
-
-### Abandoned Cart Processing
-```
-Cart not updated → Configured period exceeded → Process abandoned cart
-```
-
-The exact scheduler timing should be configured according to business requirements.
-
----
-
-# 27. Logging
-The project uses Lombok `@Slf4j` annotation.
-
-Example:
-```java
-log.info("Creating product: {}", request.name());
-```
-
-Other levels:
-```
-log.debug("Product details: {}", product);
-log.warn("Low stock for product: {}", productId);
-log.error("Unable to process order: {}", orderId);
-```
-
-**Recommended levels:**
-- INFO → Important application events
-- DEBUG → Development/debug information
-- WARN → Potential problems
-- ERROR → Failures/exceptions
-
----
-
-# 28. Swagger / OpenAPI
-Swagger provides interactive API documentation.
-
-**URLs:**
-```
-http://localhost:8080/swagger-ui.html
-http://localhost:8080/v3/api-docs
-```
-
-Swagger allows developers to:
-- View endpoints
-- View request bodies
-- View response bodies
-- Execute APIs
-- Test validation
-- Test different HTTP methods
-
----
-
-# 29. API Versioning
-The project uses URI-based versioning.
-
-**Version 1:**
-```
-/api/v1/customers
-/api/v1/products
-/api/v1/orders
-```
-
-**Version 2:**
-```
-/api/v2/products
-```
-
-Versioning allows the API contract to evolve without immediately breaking existing clients.
-
----
-
-# 30. Actuator
-Spring Boot Actuator provides monitoring endpoints.
-
-**Health:**
-```
-GET /actuator/health
-Response: { "status": "UP" }
-```
-
-**Information:**
-```
-GET /actuator/info
-```
-
-**Metrics:**
-```
-GET /actuator/metrics
-```
-
-**Loggers:**
-```
-GET /actuator/loggers
-```
-
-Only expose the endpoints required by your environment.
-
----
-
-# 31. Product Image Upload
-Products can optionally have an image.
-
-**Endpoint:**
-```
-POST /api/v1/products/{id}/image
-```
-
-**Request:**
-```
-Content-Type: multipart/form-data
-
-Key: file
-Type: File
-Value: <select image>
-```
-
-**Example:**
-```
-POST http://localhost:8080/api/v1/products/1/image
-```
-
-The sample project stores uploaded files locally. For production, consider object storage such as AWS S3, Azure Blob Storage, or Google Cloud Storage.
-
----
-
-# 32. REST API Endpoints
-
-## Customer APIs
-
-### Create Customer
-```
-POST /api/v1/customers
-
-{
-  "name": "Anna Reddy",
-  "email": "anna@example.com",
-  "phone": "9876543210",
-  "address": "Bangalore"
-}
-```
-
-### Get All Customers
-```
-GET /api/v1/customers
-```
-
-### Get Customer By ID
-```
-GET /api/v1/customers/{id}
-```
-
-### Update Customer
-```
-PUT /api/v1/customers/{id}
-```
-
-### Delete Customer
-```
-DELETE /api/v1/customers/{id}
-```
-
----
-
-## Product APIs
-
-### Create Product
-```
-POST /api/v1/products
-
-{
-  "name": "Mechanical Keyboard",
-  "description": "RGB Mechanical Keyboard",
-  "price": 2499.00,
-  "stock": 50,
-  "category": "ELECTRONICS"
-}
-```
-
-### Get All Products
-```
-GET /api/v1/products
-```
-
-### Get Product
-```
-GET /api/v1/products/{id}
-```
-
-### Update Product
-```
-PUT /api/v1/products/{id}
-```
-
-### Delete Product
-```
-DELETE /api/v1/products/{id}
-```
-
-### Product Image Upload
-```
-POST /api/v1/products/{id}/image
-```
-
----
-
-## Order APIs
-
-### Create Order
-```
-POST /api/v1/orders
-
-{
-  "customerId": 1,
-  "totalAmount": 4998.00
-}
-```
-
-Note: In the final checkout implementation, total amount should be calculated from OrderItems rather than blindly trusting a client-supplied total.
-
-### Get All Orders
-```
-GET /api/v1/orders
-```
-
-### Get Order By ID
-```
-GET /api/v1/orders/{id}
-```
-
-### Update Order
-```
-PUT /api/v1/orders/{id}
-```
-
-### Delete Order
-```
-DELETE /api/v1/orders/{id}
-```
-
----
-
-## Order Item APIs
-
-Recommended endpoints:
-```
-POST   /api/v1/order-items
-GET    /api/v1/order-items
-GET    /api/v1/order-items/{id}
-PUT    /api/v1/order-items/{id}
-DELETE /api/v1/order-items/{id}
-```
-
-Order items should normally be created as part of the checkout/order transaction rather than being freely manipulated in every production scenario.
-
----
-
-## Shopping Cart APIs
-
-```
-POST   /api/v1/carts
-GET    /api/v1/carts
-GET    /api/v1/carts/{id}
-PUT    /api/v1/carts/{id}
-DELETE /api/v1/carts/{id}
-```
-
----
-
-## Cart Item APIs
-
-Recommended endpoints:
-```
-POST   /api/v1/cart-items
-GET    /api/v1/cart-items
-GET    /api/v1/cart-items/{id}
-PUT    /api/v1/cart-items/{id}
-DELETE /api/v1/cart-items/{id}
-```
-
----
-
-## Payment APIs
-
-```
-POST   /api/v1/payments
-GET    /api/v1/payments
-GET    /api/v1/payments/{id}
-PUT    /api/v1/payments/{id}
-DELETE /api/v1/payments/{id}
-```
-
-Payment processing should eventually be integrated with an actual payment gateway rather than treating the REST endpoint itself as a payment processor.
-
----
-
-# 33. HTTP Status Codes
-The API follows these status codes:
-
-| Status | Meaning |
-|---|---|
-| 200 | OK / Request succeeded |
-| 201 | Created |
-| 204 | No Content |
-| 400 | Bad Request |
-| 404 | Not Found |
-| 409 | Conflict |
-| 500 | Internal Server Error |
-
----
-
-# 34. Example Successful Response
-
-```json
-{
-  "id": 1,
-  "name": "Mechanical Keyboard",
-  "price": 2499.00,
-  "stock": 50,
-  "category": "ELECTRONICS"
-}
-```
-
----
-
-# 35. Example 404 Response
 
 ```json
 {
@@ -1322,9 +811,1163 @@ The API follows these status codes:
 
 ---
 
-# 36. Example Validation Error
+# 16. Repository Layer
 
-Request:
+Repositories extend:
+
+```java
+JpaRepository<Entity, Long>
+```
+
+Example:
+
+```java
+public interface ProductRepository
+        extends JpaRepository<Product, Long> {
+}
+```
+
+Spring Data JPA provides:
+
+```text
+save()
+findAll()
+findById()
+delete()
+deleteById()
+count()
+existsById()
+```
+
+---
+
+# 17. Query Types
+
+The project demonstrates three query approaches.
+
+## JPQL
+
+```java
+@Query("""
+    SELECT p
+    FROM Product p
+    WHERE p.price BETWEEN :min AND :max
+""")
+```
+
+JPQL uses entity names and entity fields.
+
+---
+
+## Native SQL
+
+```java
+@Query(
+    value = "SELECT * FROM products WHERE stock > :minimumStock",
+    nativeQuery = true
+)
+```
+
+Native SQL uses actual database tables and columns.
+
+---
+
+## Named Query
+
+The `Product` entity contains:
+
+```java
+@NamedQuery(
+    name = "Product.findActiveByCategoryNamed",
+    query = """
+        SELECT p
+        FROM Product p
+        WHERE p.category = :category
+        AND p.status =
+        com.example.ecommerce.entity.ProductStatus.ACTIVE
+    """
+)
+```
+
+---
+
+# 18. Transaction Management
+
+Checkout is a transactional business operation.
+
+The checkout process includes:
+
+```text
+Validate Customer
+      ↓
+Get Shopping Cart
+      ↓
+Get Cart Items
+      ↓
+Validate Products
+      ↓
+Check Stock
+      ↓
+Create Order
+      ↓
+Create Order Items
+      ↓
+Calculate Total
+      ↓
+Reduce Product Stock
+      ↓
+Create Payment
+      ↓
+Clear Cart
+      ↓
+Commit Transaction
+```
+
+The operation should be wrapped with:
+
+```java
+@Transactional
+```
+
+If a critical operation fails:
+
+```text
+ROLLBACK
+```
+
+This prevents partially completed orders.
+
+---
+
+# 19. Scheduler
+
+Spring Scheduling is used for background tasks.
+
+Enable scheduling:
+
+```java
+@EnableScheduling
+```
+
+Example use cases:
+
+### Expired Order Cancellation
+
+```text
+PENDING
+   ↓
+Expired
+   ↓
+CANCELLED
+```
+
+### Abandoned Cart Processing
+
+```text
+Cart not updated
+       ↓
+Configured period exceeded
+       ↓
+Process abandoned cart
+```
+
+---
+
+# 20. Logging
+
+The project uses Lombok:
+
+```java
+@Slf4j
+```
+
+Example:
+
+```java
+log.info("Creating product: {}", request.name());
+```
+
+Recommended levels:
+
+```text
+INFO   → Important application events
+DEBUG  → Development/debug information
+WARN   → Potential problems
+ERROR  → Failures
+```
+
+Sensitive information such as payment secrets, card numbers and tokens should not be logged.
+
+---
+
+# 21. Swagger / OpenAPI
+
+Swagger UI:
+
+```text
+http://localhost:8080/swagger-ui.html
+```
+
+OpenAPI JSON:
+
+```text
+http://localhost:8080/v3/api-docs
+```
+
+Swagger allows developers to:
+
+* View APIs
+* View request bodies
+* View response bodies
+* Execute APIs
+* Test validation
+* Test different HTTP methods
+
+---
+
+# 22. API Versioning
+
+The project uses URI-based API versioning.
+
+## V1
+
+```text
+/api/v1/customers
+/api/v1/products
+/api/v1/shopping-carts
+/api/v1/cart-items
+/api/v1/orders
+/api/v1/order-items
+/api/v1/payments
+```
+
+## V2
+
+```text
+/api/v2/products
+```
+
+---
+
+# 23. Complete Postman API Reference
+
+Base URL:
+
+```text
+http://localhost:8080
+```
+
+---
+
+## 23.1 Customer APIs
+
+| Method | URL                      | Purpose            |
+| ------ | ------------------------ | ------------------ |
+| POST   | `/api/v1/customers`      | Create customer    |
+| GET    | `/api/v1/customers`      | Get all customers  |
+| GET    | `/api/v1/customers/{id}` | Get customer by ID |
+| PUT    | `/api/v1/customers/{id}` | Update customer    |
+| DELETE | `/api/v1/customers/{id}` | Delete customer    |
+
+### Full URLs
+
+```text
+POST   http://localhost:8080/api/v1/customers
+GET    http://localhost:8080/api/v1/customers
+GET    http://localhost:8080/api/v1/customers/{id}
+PUT    http://localhost:8080/api/v1/customers/{id}
+DELETE http://localhost:8080/api/v1/customers/{id}
+```
+
+### Create Customer
+
+```json
+{
+  "name": "Anna Reddy",
+  "email": "anna@example.com",
+  "phone": "9876543210",
+  "address": "Bangalore"
+}
+```
+
+---
+
+# 24. Product APIs — V1
+
+| Method | URL                                                    | Purpose                 |
+| ------ | ------------------------------------------------------ | ----------------------- |
+| POST   | `/api/v1/products`                                     | Create product          |
+| GET    | `/api/v1/products`                                     | Get all products        |
+| GET    | `/api/v1/products/{id}`                                | Get product by ID       |
+| PUT    | `/api/v1/products/{id}`                                | Update product          |
+| DELETE | `/api/v1/products/{id}`                                | Delete product          |
+| POST   | `/api/v1/products/{id}/reduce-stock?quantity=5`        | Reduce stock            |
+| POST   | `/api/v1/products/{id}/increase-stock?quantity=5`      | Increase stock          |
+| POST   | `/api/v1/products/{id}/image`                          | Upload image            |
+| GET    | `/api/v1/products/query/stock?minimumStock=10`         | Query minimum stock     |
+| GET    | `/api/v1/products/query/price-range?min=100&max=1000`  | Query price range       |
+| GET    | `/api/v1/products/query/category?category=ELECTRONICS` | Query category          |
+| GET    | `/api/v1/products/price-range?min=100&max=1000`        | Find by price range     |
+| GET    | `/api/v1/products/low-stock/10`                        | Find low-stock products |
+| GET    | `/api/v1/products/category/ELECTRONICS`                | Find by category        |
+
+### Full URLs
+
+```text
+POST   http://localhost:8080/api/v1/products
+GET    http://localhost:8080/api/v1/products
+GET    http://localhost:8080/api/v1/products/{id}
+PUT    http://localhost:8080/api/v1/products/{id}
+DELETE http://localhost:8080/api/v1/products/{id}
+
+POST   http://localhost:8080/api/v1/products/{id}/reduce-stock?quantity=5
+POST   http://localhost:8080/api/v1/products/{id}/increase-stock?quantity=5
+
+POST   http://localhost:8080/api/v1/products/{id}/image
+
+GET    http://localhost:8080/api/v1/products/query/stock?minimumStock=10
+GET    http://localhost:8080/api/v1/products/query/price-range?min=100&max=1000
+GET    http://localhost:8080/api/v1/products/query/category?category=ELECTRONICS
+
+GET    http://localhost:8080/api/v1/products/price-range?min=100&max=1000
+GET    http://localhost:8080/api/v1/products/low-stock/10
+GET    http://localhost:8080/api/v1/products/category/ELECTRONICS
+```
+
+### Create Product
+
+```json
+{
+  "name": "Mechanical Keyboard",
+  "description": "RGB Mechanical Keyboard",
+  "price": 2499.00,
+  "stock": 50,
+  "category": "ELECTRONICS"
+}
+```
+
+---
+
+# 25. Product APIs — V2
+
+| Method | URL                                               | Purpose          |
+| ------ | ------------------------------------------------- | ---------------- |
+| POST   | `/api/v2/products`                                | Create product   |
+| GET    | `/api/v2/products`                                | Get all products |
+| GET    | `/api/v2/products/{id}`                           | Get product      |
+| PUT    | `/api/v2/products/{id}`                           | Update product   |
+| DELETE | `/api/v2/products/{id}`                           | Delete product   |
+| POST   | `/api/v2/products/{id}/reduce-stock?quantity=5`   | Reduce stock     |
+| POST   | `/api/v2/products/{id}/increase-stock?quantity=5` | Increase stock   |
+| POST   | `/api/v2/products/{id}/image`                     | Upload image     |
+| GET    | `/api/v2/products/price-range?min=100&max=1000`   | Price range      |
+| GET    | `/api/v2/products/low-stock/10`                   | Low stock        |
+| GET    | `/api/v2/products/category/ELECTRONICS`           | Category         |
+
+### Full URLs
+
+```text
+POST   http://localhost:8080/api/v2/products
+GET    http://localhost:8080/api/v2/products
+GET    http://localhost:8080/api/v2/products/{id}
+PUT    http://localhost:8080/api/v2/products/{id}
+DELETE http://localhost:8080/api/v2/products/{id}
+
+POST   http://localhost:8080/api/v2/products/{id}/reduce-stock?quantity=5
+POST   http://localhost:8080/api/v2/products/{id}/increase-stock?quantity=5
+
+POST   http://localhost:8080/api/v2/products/{id}/image
+
+GET    http://localhost:8080/api/v2/products/price-range?min=100&max=1000
+GET    http://localhost:8080/api/v2/products/low-stock/10
+GET    http://localhost:8080/api/v2/products/category/ELECTRONICS
+```
+
+---
+
+# 26. Shopping Cart APIs
+
+The actual controller uses:
+
+```text
+/api/v1/shopping-carts
+```
+
+**Note:** This is the correct path. Do not use `/api/v1/carts`.
+
+| Method | URL                                            | Purpose             |
+| ------ | ---------------------------------------------- | ------------------- |
+| POST   | `/api/v1/shopping-carts`                       | Create cart         |
+| GET    | `/api/v1/shopping-carts`                       | Get all carts       |
+| GET    | `/api/v1/shopping-carts/{id}`                  | Get cart            |
+| GET    | `/api/v1/shopping-carts/customer/{customerId}` | Get customer's cart |
+| DELETE | `/api/v1/shopping-carts/{id}`                  | Delete cart         |
+| DELETE | `/api/v1/shopping-carts/{id}/clear`            | Clear cart          |
+
+### Full URLs
+
+```text
+POST   http://localhost:8080/api/v1/shopping-carts
+GET    http://localhost:8080/api/v1/shopping-carts
+GET    http://localhost:8080/api/v1/shopping-carts/{id}
+
+GET    http://localhost:8080/api/v1/shopping-carts/customer/{customerId}
+
+DELETE http://localhost:8080/api/v1/shopping-carts/{id}
+
+DELETE http://localhost:8080/api/v1/shopping-carts/{id}/clear
+```
+
+---
+
+# 27. Cart Item APIs
+
+| Method | URL                                | Purpose            |
+| ------ | ---------------------------------- | ------------------ |
+| POST   | `/api/v1/cart-items`               | Add cart item      |
+| GET    | `/api/v1/cart-items`               | Get all cart items |
+| GET    | `/api/v1/cart-items/{id}`          | Get cart item      |
+| GET    | `/api/v1/cart-items/cart/{cartId}` | Get items by cart  |
+| PUT    | `/api/v1/cart-items/{id}`          | Update quantity    |
+| DELETE | `/api/v1/cart-items/{id}`          | Delete cart item   |
+
+### Full URLs
+
+```text
+POST   http://localhost:8080/api/v1/cart-items
+GET    http://localhost:8080/api/v1/cart-items
+GET    http://localhost:8080/api/v1/cart-items/{id}
+
+GET    http://localhost:8080/api/v1/cart-items/cart/{cartId}
+
+PUT    http://localhost:8080/api/v1/cart-items/{id}
+DELETE http://localhost:8080/api/v1/cart-items/{id}
+```
+
+---
+
+# 28. Order APIs
+
+| Method | URL                                    | Purpose                |
+| ------ | -------------------------------------- | ---------------------- |
+| POST   | `/api/v1/orders`                       | Create order           |
+| GET    | `/api/v1/orders`                       | Get all orders         |
+| GET    | `/api/v1/orders/{id}`                  | Get order              |
+| PUT    | `/api/v1/orders/{id}`                  | Update order           |
+| DELETE | `/api/v1/orders/{id}`                  | Delete order           |
+| POST   | `/api/v1/orders/{id}/confirm`          | Confirm order          |
+| POST   | `/api/v1/orders/{id}/cancel`           | Cancel order           |
+| POST   | `/api/v1/orders/checkout`              | Checkout shopping cart |
+| GET    | `/api/v1/orders/status/{status}`       | Get orders by status   |
+| GET    | `/api/v1/orders/customer/{customerId}` | Get customer orders    |
+
+### Full URLs
+
+```text
+POST   http://localhost:8080/api/v1/orders
+GET    http://localhost:8080/api/v1/orders
+GET    http://localhost:8080/api/v1/orders/{id}
+PUT    http://localhost:8080/api/v1/orders/{id}
+DELETE http://localhost:8080/api/v1/orders/{id}
+
+POST   http://localhost:8080/api/v1/orders/{id}/confirm
+POST   http://localhost:8080/api/v1/orders/{id}/cancel
+
+POST   http://localhost:8080/api/v1/orders/checkout
+
+GET    http://localhost:8080/api/v1/orders/status/PENDING
+GET    http://localhost:8080/api/v1/orders/customer/{customerId}
+```
+
+Valid statuses:
+
+```text
+PENDING
+CONFIRMED
+SHIPPED
+DELIVERED
+CANCELLED
+```
+
+---
+
+# 29. Order Item APIs
+
+| Method | URL                                   | Purpose             |
+| ------ | ------------------------------------- | ------------------- |
+| POST   | `/api/v1/order-items`                 | Create order item   |
+| GET    | `/api/v1/order-items`                 | Get all order items |
+| GET    | `/api/v1/order-items/{id}`            | Get order item      |
+| GET    | `/api/v1/order-items/order/{orderId}` | Get items by order  |
+| PUT    | `/api/v1/order-items/{id}`            | Update order item   |
+| DELETE | `/api/v1/order-items/{id}`            | Delete order item   |
+
+### Full URLs
+
+```text
+POST   http://localhost:8080/api/v1/order-items
+GET    http://localhost:8080/api/v1/order-items
+GET    http://localhost:8080/api/v1/order-items/{id}
+
+GET    http://localhost:8080/api/v1/order-items/order/{orderId}
+
+PUT    http://localhost:8080/api/v1/order-items/{id}
+DELETE http://localhost:8080/api/v1/order-items/{id}
+```
+
+---
+
+# 30. Payment APIs
+
+| Method | URL                                | Purpose                |
+| ------ | ---------------------------------- | ---------------------- |
+| POST   | `/api/v1/payments`                 | Create payment         |
+| GET    | `/api/v1/payments`                 | Get all payments       |
+| GET    | `/api/v1/payments/{id}`            | Get payment            |
+| PUT    | `/api/v1/payments/{id}`            | Update payment         |
+| DELETE | `/api/v1/payments/{id}`            | Delete payment         |
+| POST   | `/api/v1/payments/{id}/process`    | Process payment        |
+| GET    | `/api/v1/payments/status/{status}` | Get payments by status |
+| GET    | `/api/v1/payments/order/{orderId}` | Get payment by order   |
+
+### Full URLs
+
+```text
+POST   http://localhost:8080/api/v1/payments
+GET    http://localhost:8080/api/v1/payments
+GET    http://localhost:8080/api/v1/payments/{id}
+PUT    http://localhost:8080/api/v1/payments/{id}
+DELETE http://localhost:8080/api/v1/payments/{id}
+
+POST   http://localhost:8080/api/v1/payments/{id}/process
+
+GET    http://localhost:8080/api/v1/payments/status/PENDING
+GET    http://localhost:8080/api/v1/payments/order/{orderId}
+```
+
+Valid payment statuses:
+
+```text
+PENDING
+SUCCESS
+FAILED
+REFUNDED
+```
+
+Valid payment methods:
+
+```text
+CASH_ON_DELIVERY
+CARD
+UPI
+NET_BANKING
+```
+
+---
+
+# 31. Correct Postman End-to-End Testing Sequence
+
+The recommended primary business flow is:
+
+```text
+1. Create Customer
+       ↓
+2. Create Product
+       ↓
+3. Create Shopping Cart
+       ↓
+4. Add Cart Item
+       ↓
+5. Get Cart
+       ↓
+6. Checkout
+       ↓
+7. Get Order
+       ↓
+8. Get Payment / Process Payment
+       ↓
+9. Confirm Order
+```
+
+## Step 1 — Create Customer
+
+```text
+POST
+http://localhost:8080/api/v1/customers
+```
+
+Example:
+
+```json
+{
+  "name": "Anna Reddy",
+  "email": "anna@example.com",
+  "phone": "9876543210",
+  "address": "Bangalore"
+}
+```
+
+Save the returned:
+
+```text
+customerId
+```
+
+---
+
+## Step 2 — Create Product
+
+```text
+POST
+http://localhost:8080/api/v1/products
+```
+
+Example:
+
+```json
+{
+  "name": "Mechanical Keyboard",
+  "description": "RGB Mechanical Keyboard",
+  "price": 2499.00,
+  "stock": 50,
+  "category": "ELECTRONICS"
+}
+```
+
+Save:
+
+```text
+productId
+```
+
+---
+
+## Step 3 — Create Shopping Cart
+
+```text
+POST
+http://localhost:8080/api/v1/shopping-carts
+```
+
+Use the customer ID created earlier.
+
+Example request will depend on the actual `ShoppingCartRequestDto`.
+
+Save:
+
+```text
+cartId
+```
+
+---
+
+## Step 4 — Add Cart Item
+
+```text
+POST
+http://localhost:8080/api/v1/cart-items
+```
+
+Use:
+
+```text
+cartId
+productId
+quantity
+```
+
+Example request will depend on your `CartItemRequestDto`.
+
+Save:
+
+```text
+cartItemId
+```
+
+---
+
+## Step 5 — Get Cart
+
+```text
+GET
+http://localhost:8080/api/v1/shopping-carts/{cartId}
+```
+
+Example:
+
+```text
+GET http://localhost:8080/api/v1/shopping-carts/1
+```
+
+Verify:
+
+```text
+Customer
+Cart
+Cart Items
+Product
+Quantity
+```
+
+---
+
+## Step 6 — Checkout
+
+```text
+POST
+http://localhost:8080/api/v1/orders/checkout
+```
+
+Use your `CheckoutRequestDto`.
+
+The checkout operation should perform:
+
+```text
+Validate Customer
+       ↓
+Get Cart
+       ↓
+Get Cart Items
+       ↓
+Validate Stock
+       ↓
+Create Order
+       ↓
+Create Order Items
+       ↓
+Calculate Total
+       ↓
+Reduce Stock
+       ↓
+Create Payment
+       ↓
+Clear Cart
+```
+
+Save:
+
+```text
+orderId
+```
+
+and, if returned:
+
+```text
+paymentId
+```
+
+---
+
+## Step 7 — Get Order
+
+```text
+GET
+http://localhost:8080/api/v1/orders/{orderId}
+```
+
+Example:
+
+```text
+GET http://localhost:8080/api/v1/orders/1
+```
+
+Verify:
+
+```text
+Customer
+Order Date
+Status
+Shipping Address
+Total Amount
+Order Items
+Payment
+```
+
+---
+
+## Step 8 — Process Payment
+
+If checkout creates a payment:
+
+```text
+POST
+http://localhost:8080/api/v1/payments/{paymentId}/process
+```
+
+Example:
+
+```text
+POST http://localhost:8080/api/v1/payments/1/process
+```
+
+Then verify:
+
+```text
+Payment Status = SUCCESS
+```
+
+and the associated order should be updated according to your service implementation.
+
+---
+
+## Step 9 — Confirm Order
+
+```text
+POST
+http://localhost:8080/api/v1/orders/{orderId}/confirm
+```
+
+Example:
+
+```text
+POST http://localhost:8080/api/v1/orders/1/confirm
+```
+
+Expected:
+
+```text
+Order Status = CONFIRMED
+```
+
+---
+
+# 32. Product Image Upload
+
+Endpoint:
+
+```text
+POST
+http://localhost:8080/api/v1/products/{id}/image
+```
+
+In Postman:
+
+```text
+Body
+  ↓
+form-data
+  ↓
+Key: file
+  ↓
+Type: File
+  ↓
+Select image
+```
+
+Example:
+
+```text
+POST http://localhost:8080/api/v1/products/1/image
+```
+
+The controller expects:
+
+```text
+@RequestParam("file") MultipartFile file
+```
+
+---
+
+# 33. Query Testing
+
+## Minimum Stock
+
+Native SQL / stock query:
+
+```text
+GET http://localhost:8080/api/v1/products/query/stock?minimumStock=10
+```
+
+---
+
+## Price Range
+
+```text
+GET http://localhost:8080/api/v1/products/query/price-range?min=1000&max=5000
+```
+
+---
+
+## Category
+
+```text
+GET http://localhost:8080/api/v1/products/query/category?category=ELECTRONICS
+```
+
+---
+
+## Price Range Service API
+
+```text
+GET http://localhost:8080/api/v1/products/price-range?min=1000&max=5000
+```
+
+---
+
+## Low Stock
+
+```text
+GET http://localhost:8080/api/v1/products/low-stock/10
+```
+
+---
+
+## Category Path Variable
+
+```text
+GET http://localhost:8080/api/v1/products/category/ELECTRONICS
+```
+
+---
+
+# 34. Stock Management
+
+## Reduce Stock
+
+```text
+POST
+http://localhost:8080/api/v1/products/1/reduce-stock?quantity=5
+```
+
+## Increase Stock
+
+```text
+POST
+http://localhost:8080/api/v1/products/1/increase-stock?quantity=5
+```
+
+---
+
+# 35. Actuator
+
+Health:
+
+```text
+GET http://localhost:8080/actuator/health
+```
+
+Info:
+
+```text
+GET http://localhost:8080/actuator/info
+```
+
+Metrics:
+
+```text
+GET http://localhost:8080/actuator/metrics
+```
+
+Loggers:
+
+```text
+GET http://localhost:8080/actuator/loggers
+```
+
+Example health response:
+
+```json
+{
+  "status": "UP"
+}
+```
+
+---
+
+# 36. HTTP Status Codes
+
+| Status | Meaning               |
+| ------ | --------------------- |
+| 200    | OK                    |
+| 201    | Created               |
+| 204    | No Content            |
+| 400    | Bad Request           |
+| 404    | Not Found             |
+| 409    | Conflict              |
+| 500    | Internal Server Error |
+
+---
+
+# 37. Example Successful Product Response
+
+```json
+{
+  "id": 1,
+  "name": "Mechanical Keyboard",
+  "description": "RGB Mechanical Keyboard",
+  "price": 2499.00,
+  "stock": 50,
+  "category": "ELECTRONICS"
+}
+```
+
+---
+
+# 38. Example Error Response
+
+```json
+{
+  "timestamp": "2026-08-17T10:30:00",
+  "status": 404,
+  "error": "Not Found",
+  "message": "Product not found: 100",
+  "path": "/api/v1/products/100"
+}
+```
+
+---
+
+# 39. Running the Application
+
+## Step 1 — Verify Java
+
+```bash
+java -version
+```
+
+Expected:
+
+```text
+Java 25
+```
+
+## Step 2 — Verify Maven
+
+```bash
+mvn -version
+```
+
+## Step 3 — Create Database
+
+```sql
+CREATE DATABASE ecommerce_db;
+```
+
+## Step 4 — Configure MySQL
+
+Update:
+
+```yaml
+spring:
+  datasource:
+    username: root
+    password: root
+```
+
+## Step 5 — Build
+
+```bash
+mvn clean install
+```
+
+Or using the Maven wrapper (no Maven installation required):
+
+```bash
+./mvnw clean install
+```
+
+## Step 6 — Run
+
+```bash
+mvn spring-boot:run
+```
+
+Or using the Maven wrapper:
+
+```bash
+./mvnw spring-boot:run
+```
+
+Or run directly from your IDE:
+
+```text
+EcommerceApplication.java
+```
+
+---
+
+# 40. Application URLs
+
+Base URL:
+
+```text
+http://localhost:8080
+```
+
+Swagger:
+
+```text
+http://localhost:8080/swagger-ui.html
+```
+
+OpenAPI:
+
+```text
+http://localhost:8080/v3/api-docs
+```
+
+Actuator:
+
+```text
+http://localhost:8080/actuator/health
+```
+
+---
+
+# 41. Testing Strategy
+
+The project can be tested using:
+
+```text
+Postman
+Swagger
+JUnit
+Mockito
+Integration Tests
+```
+
+Recommended basic sequence:
+
+```text
+Customer
+   ↓
+Product
+   ↓
+Shopping Cart
+   ↓
+Cart Item
+   ↓
+Checkout
+   ↓
+Order
+   ↓
+Payment
+```
+
+---
+
+# 42. Error Testing
+
+## Invalid Product ID
+
+```text
+GET http://localhost:8080/api/v1/products/99999
+```
+
+Expected:
+
+```text
+404 Not Found
+```
+
+---
+
+## Invalid Product
+
+```text
+POST http://localhost:8080/api/v1/products
+```
+
 ```json
 {
   "name": "",
@@ -1333,395 +1976,151 @@ Request:
 }
 ```
 
-Response:
-```json
-{
-  "timestamp": "2026-08-17T10:35:00",
-  "status": 400,
-  "error": "Bad Request",
-  "message": "Validation failed",
-  "path": "/api/v1/products",
-  "validationErrors": {
-    "name": "Product name is required",
-    "price": "Price must be greater than zero",
-    "stock": "Stock cannot be negative"
-  }
-}
+Expected:
+
+```text
+400 Bad Request
 ```
 
 ---
 
-# 37. Running the Application
+## Duplicate Customer
 
-## Step 1 — Clone / Open Project
-Open the project in IntelliJ IDEA or VS Code.
+Create the same customer email twice.
 
-## Step 2 — Verify Java
-```bash
-java -version
-```
-Expected: Java 17
+Expected:
 
-## Step 3 — Verify Maven
-```bash
-mvn -version
-```
-
-## Step 4 — Create Database
-```sql
-CREATE DATABASE ecommerce_db;
-```
-
-## Step 5 — Configure MySQL
-Update `application.properties` or `application.yml`:
-```yaml
-spring:
-  datasource:
-    username: root
-    password: root
-```
-
-Update with your actual MySQL credentials.
-
-## Step 6 — Build
-```bash
-mvn clean install
-```
-
-## Step 7 — Run
-```bash
-mvn spring-boot:run
-```
-
-Or run `EcommerceApplication.java` from your IDE.
-
----
-
-# 38. Application URL
-```
-http://localhost:8080
+```text
+409 Conflict
 ```
 
 ---
 
-# 39. Swagger URL
-```
-http://localhost:8080/swagger-ui.html
-```
+# 43. Complete Checkout Example
 
----
+Suppose:
 
-# 40. Actuator URLs
-
-```
-http://localhost:8080/actuator/health
-http://localhost:8080/actuator/info
-http://localhost:8080/actuator/metrics
-http://localhost:8080/actuator/loggers
-```
-
----
-
-# 41. Recommended Development Order
-
-Build the application in this order:
-
-```
-1. Project Setup
-2. Database Configuration
-3. Entity Classes
-4. Entity Relationships
-5. Enum Classes
-6. Repository Layer
-7. Customer CRUD
-8. Product CRUD
-9. Order CRUD
-10. OrderItem
-11. ShoppingCart
-12. CartItem
-13. Payment
-14. Request DTO
-15. Response DTO
-16. Validation
-17. Custom Exceptions
-18. Global Exception Handler
-19. JPQL
-20. Native Queries
-21. Named Queries
-22. Auditing
-23. Transactions
-24. Checkout Transaction
-25. Scheduler
-26. Logging
-27. Swagger
-28. API Versioning
-29. Actuator
-30. Image Upload
-31. Postman Testing
-32. Final Documentation
-```
-
----
-
-# 42. Complete Checkout Flow
-
-The most important business flow is:
-
-```
-Customer
-   ↓
-Add Product
-   ↓
-Shopping Cart
-   ↓
-Cart Items
-   ↓
-Checkout
-   ↓
-Validate Customer
-   ↓
-Validate Products
-   ↓
-Check Stock
-   ↓
-Create Order
-   ↓
-Create Order Items
-   ↓
-Calculate Total
-   ↓
-Reduce Product Stock
-   ↓
-Create Payment
-   ↓
-Commit Transaction
-```
-
-If any critical operation fails: **ROLLBACK**
-
----
-
-# 43. Example Checkout Scenario
-
-**Customer:**
-```
+```text
 Customer ID = 1
 ```
 
-**Cart:**
-```
-Product A: Quantity 2, Price ₹500
-Product B: Quantity 1, Price ₹1000
+Cart contains:
+
+```text
+Product A
+Quantity = 2
+Price = ₹500
+
+Product B
+Quantity = 1
+Price = ₹1000
 ```
 
-**Calculation:**
-```
-Product A: 2 × ₹500 = ₹1000
-Product B: 1 × ₹1000 = ₹1000
+Calculation:
+
+```text
+Product A
+2 × ₹500 = ₹1000
+
+Product B
+1 × ₹1000 = ₹1000
+
 Total = ₹2000
 ```
 
-**Order:**
-```
+Expected order:
+
+```text
 Order Status = PENDING
 Total Amount = ₹2000
 ```
 
-**After successful payment:**
-```
-Order Status = CONFIRMED
+After successful payment and confirmation:
+
+```text
 Payment Status = SUCCESS
+Order Status = CONFIRMED
 ```
 
 ---
 
-# 44. Logging Strategy
+# 44. API Version Testing
 
-Recommended logging places:
-```
-Controller
-   ↓
-Service
-   ↓
-Repository
+## V1
+
+```text
+GET http://localhost:8080/api/v1/products
 ```
 
-Most business logs should be placed in the **service layer**.
+## V2
+
+```text
+GET http://localhost:8080/api/v2/products
+```
+
+V2 allows the API contract to evolve while existing clients continue using V1.
+
+---
+
+# 45. Git Branch Structure
+
+Recommended branches:
+
+```text
+main
+develop
+
+feature/customer
+feature/product
+feature/order
+feature/cart
+feature/payment
+feature/swagger
+feature/scheduler
+feature/file-upload
+```
 
 Example:
-```java
-log.info("Creating order for customerId={}", customerId);
-```
 
-**Avoid logging sensitive information** such as:
-- Passwords
-- Card numbers
-- Authentication tokens
-- Payment secrets
-
----
-
-# 45. File Upload Structure
-
-Uploaded images can be stored under:
-```
-uploads/
-└── products/
-    ├── product-image-1.jpg
-    ├── product-image-2.png
-    └── ...
-```
-
-The database stores the image path/reference. The image itself should not normally be stored directly inside the Product entity as a large binary object unless there is a specific requirement.
-
----
-
-# 46. Testing Strategy
-
-The project should be tested using:
-```
-Swagger
-Postman
-JUnit
-Mockito
-Integration Tests
-```
-
-**Basic testing order:**
-```
-Customer
-   ↓
-Product
-   ↓
-Cart
-   ↓
-Cart Items
-   ↓
-Order
-   ↓
-Order Items
-   ↓
-Payment
+```bash
+git checkout -b feature/product
+git add .
+git commit -m "Implement product CRUD APIs"
+git push -u origin feature/product
 ```
 
 ---
 
-# 47. Postman Testing Sequence
+# 46. Useful Maven Commands
 
-Use this sequence:
-```
-1. Create Customer
-2. Get Customer
-3. Create Product
-4. Get Product
-5. Update Product
-6. Create Shopping Cart
-7. Add Cart Item
-8. Get Cart
-9. Create Order
-10. Create Order Items
-11. Process Payment
-12. Check Order
-13. Check Product Stock
-14. Test Validation
-15. Test 404
-16. Test Duplicate Exception
-17. Test Scheduler
-18. Test Image Upload
+```bash
+# Standard Maven
+mvn clean
+mvn compile
+mvn test
+mvn package
+mvn clean package
+mvn spring-boot:run
+
+# Maven Wrapper (no installation required)
+./mvnw clean
+./mvnw compile
+./mvnw test
+./mvnw package
+./mvnw clean package
+./mvnw spring-boot:run
 ```
 
 ---
 
-# 48. Query Testing
+# 47. Production Improvements
 
-Test all three query mechanisms.
+For a production-ready system, consider adding:
 
-### JPQL
-```
-GET /api/v1/products/query/price-range?min=1000&max=5000
-```
-
-### Native SQL
-```
-GET /api/v1/products/query/stock?minimumStock=10
-```
-
-### Named Query
-```
-GET /api/v1/products/query/category?category=ELECTRONICS
-```
-
----
-
-# 49. Version Testing
-
-**V1:**
-```
-GET /api/v1/products
-```
-
-**V2:**
-```
-GET /api/v2/products
-```
-
-When the API contract changes in the future, existing clients remain on V1 while new clients use V2.
-
----
-
-# 50. Error Testing
-
-### Invalid ID
-```
-GET /api/v1/products/99999
-```
-Expected: `404 Not Found`
-
-### Invalid Request
-```
-POST /api/v1/products
-
-{
-  "name": "",
-  "price": -100
-}
-```
-Expected: `400 Bad Request`
-
-### Duplicate Customer
-Try registering the same email twice.
-Expected: `409 Conflict`
-
----
-
-# 51. Scheduler Testing
-
-For development, configure a short interval:
-```java
-@Scheduled(fixedRate = 30000)
-```
-
-This runs every 30 seconds.
-
-For actual business configuration, use a property:
-```yaml
-app:
-  scheduler:
-    order-cancellation-rate: 300000
-```
-
-This avoids hard-coding scheduling values.
-
----
-
-# 52. Production Improvements
-
-This project is designed as a strong learning/reference project. For production, consider adding:
-
-```
+```text
+Spring Security
 JWT Authentication
 Role-Based Authorization
-Spring Security
 Pagination
 Sorting
 Filtering
@@ -1746,256 +2145,278 @@ Database Indexing
 
 ---
 
-# 53. Future Module Expansion
-
-The architecture allows additional modules to be added without disturbing the existing structure.
-
-Possible future packages:
-```
-auth
-security
-notification
-wishlist
-review
-coupon
-category
-inventory
-shipping
-delivery
-```
-
----
-
-# 54. Important Design Rules
+# 48. Important Design Rules
 
 ### Rule 1
-Do not expose JPA entities directly from controllers. Use Request DTO and Response DTO.
+
+Do not expose JPA entities directly from controllers.
+
+Use:
+
+```text
+Request DTO
+Response DTO
+```
 
 ### Rule 2
-Business logic belongs in Service, not Controller.
+
+Business logic belongs in the Service layer.
 
 ### Rule 3
-Database operations belong in Repository.
+
+Database operations belong in the Repository layer.
 
 ### Rule 4
+
 Controllers should mainly handle:
-- HTTP request
-- HTTP response
-- validation
-- routing
+
+```text
+HTTP Request
+HTTP Response
+Validation
+Routing
+```
 
 ### Rule 5
-Transactions should be placed around business operations (e.g., Checkout) rather than unnecessarily making every method transactional.
+
+Use transactions around business operations such as checkout.
 
 ### Rule 6
+
 Use custom exceptions for expected business errors.
 
 ### Rule 7
+
 Use enums for fixed business states.
 
 ### Rule 8
-Use logging instead of `System.out.println()`.
 
----
+Use logging instead of:
 
-# 55. Git Structure
-
-Recommended Git branches:
-```
-main
-develop
-feature/customer
-feature/product
-feature/order
-feature/cart
-feature/payment
-feature/swagger
-feature/scheduler
-feature/file-upload
-```
-
-Example:
-```bash
-git checkout -b feature/product
-git add .
-git commit -m "Implement product CRUD APIs"
+```java
+System.out.println()
 ```
 
 ---
 
-# 56. Useful Maven Commands
+# 49. Final Project Flow
 
-```bash
-mvn clean                   # Clean project
-mvn compile                 # Compile
-mvn test                    # Run tests
-mvn package                 # Package
-mvn clean package           # Clean and package
-mvn spring-boot:run         # Run Spring Boot
+```text
+                     E-COMMERCE REST API
+                              │
+          ┌───────────────────┼───────────────────┐
+          │                   │                   │
+      Customer             Product             Order
+          │                   │                   │
+          │                   │              OrderItem
+          │                   │                   │
+          │                   └───────────────────┘
+          │
+     ShoppingCart
+          │
+       CartItem
+          │
+       Product
+
+        Order
+          │
+       Payment
 ```
 
----
+Application architecture:
 
-# 57. Common Problems
-
-## MySQL connection error
-Check:
-- MySQL service is running
-- Database name is correct
-- Username and password are correct
-- Port is 3306
-
-## Port already in use
-Change port in `application.properties`:
-```properties
-server.port=8081
-```
-
-## Lombok not working
-Check:
-- IntelliJ: Settings → Plugins → Lombok
-- Enable annotation processing: Settings → Build, Execution, Deployment → Compiler → Annotation Processors
-
-## Table not created
-Check:
-- `spring.jpa.hibernate.ddl-auto: update` is configured
-- Database connection is working
-
----
-
-# 58. Project Flow Summary
-
-**Complete Architecture:**
-```
-                E-COMMERCE REST API
+```text
+                     Client
                        │
-        ┌──────────────┼──────────────┐
-        │              │              │
-    Customer        Product         Order
-        │              │              │
-        │              │          OrderItem
-        │              │              │
-        │              └──────────────┘
-        │
-   ShoppingCart
-        │
-    CartItem
-        │
-     Product
-
-     Order
-       │
-    Payment
+                       ▼
+                  Controller
+                       │
+                       ▼
+                  Request DTO
+                       │
+                       ▼
+                    Service
+                       │
+              ┌────────┴────────┐
+              │                 │
+       Business Logic       Transaction
+              │                 │
+              └────────┬────────┘
+                       ▼
+                  Repository
+                       │
+                       ▼
+                     JPA
+                       │
+                       ▼
+                    MySQL
 ```
 
-**Application Architecture:**
-```
-                Client
-                  │
-                  ▼
-              Controller
-                  │
-                  ▼
-              Request DTO
-                  │
-                  ▼
-               Service
-                  │
-          ┌───────┴───────┐
-          │               │
-    Business Logic   Transaction
-          │               │
-          └───────┬───────┘
-                  ▼
-             Repository
-                  │
-                  ▼
-                JPA
-                  │
-                  ▼
-               MySQL
-```
+Supporting components:
 
-**Supporting Components:**
-```
-    ┌───────────────┐
-    │   Scheduler   │
-    └───────┬───────┘
-            │
-            ▼
-        Service
-
-    ┌───────────────┐
-    │    Swagger    │
-    └───────────────┘
-
-    ┌───────────────┐
-    │   Actuator    │
-    └───────────────┘
-
-    ┌───────────────┐
-    │    Logger     │
-    └───────────────┘
-
-    ┌───────────────┐
-    │    Global     │
-    │   Exception   │
-    │    Handler    │
-    └───────────────┘
+```text
+Scheduler
+Swagger / OpenAPI
+Actuator
+Logging
+Global Exception Handler
+File Storage
 ```
 
 ---
 
-# 59. Final Checklist
+# 50. Recommended Development Order
 
-Before considering the project complete:
-
-- [ ] Project starts successfully
-- [ ] MySQL connection works
-- [ ] All seven entities created
-- [ ] Entity relationships verified
-- [ ] Enum classes implemented
-- [ ] Customer CRUD completed
-- [ ] Product CRUD completed
-- [ ] Order CRUD completed
-- [ ] OrderItem implemented
-- [ ] ShoppingCart implemented
-- [ ] CartItem implemented
-- [ ] Payment implemented
-- [ ] Request DTOs implemented
-- [ ] Response DTOs implemented
-- [ ] Validation implemented
-- [ ] Custom exceptions implemented
-- [ ] Global exception handler implemented
-- [ ] JPQL query implemented
-- [ ] Native SQL query implemented
-- [ ] Named query implemented
-- [ ] Auditing implemented
-- [ ] Transaction management implemented
-- [ ] Checkout transaction implemented
-- [ ] Scheduler implemented
-- [ ] Logging implemented
-- [ ] Swagger implemented
-- [ ] API versioning implemented
-- [ ] Actuator implemented
-- [ ] Product image upload implemented
-- [ ] Postman testing completed
-- [ ] Unit tests added
-- [ ] Integration tests added
-- [ ] README updated
+```text
+1. Project Setup
+2. Database Configuration
+3. Entity Classes
+4. Entity Relationships
+5. Enum Classes
+6. Repository Layer
+7. Customer CRUD
+8. Product CRUD
+9. ShoppingCart
+10. CartItem
+11. Order CRUD
+12. OrderItem
+13. Payment
+14. Request DTOs
+15. Response DTOs
+16. Validation
+17. Custom Exceptions
+18. Global Exception Handler
+19. JPQL Queries
+20. Native SQL Queries
+21. Named Queries
+22. Auditing
+23. Transaction Management
+24. Checkout Transaction
+25. Scheduler
+26. Logging
+27. Swagger
+28. API Versioning
+29. Actuator
+30. Image Upload
+31. Postman Testing
+32. Unit Tests
+33. Integration Tests
+34. Final Documentation
+```
 
 ---
 
-# 60. Final Goal
+# 51. Final Postman Checklist
 
-The final project should demonstrate that a complete Spring Boot E-commerce backend can be designed using:
+```text
+Customer
+[ ] Create Customer
+[ ] Get All Customers
+[ ] Get Customer By ID
+[ ] Update Customer
+[ ] Delete Customer
 
+Product V1
+[ ] Create Product
+[ ] Get All Products
+[ ] Get Product
+[ ] Update Product
+[ ] Delete Product
+[ ] Reduce Stock
+[ ] Increase Stock
+[ ] Upload Image
+[ ] Minimum Stock Query
+[ ] Price Range Query
+[ ] Category Query
+[ ] Low Stock
+[ ] Category Path API
+
+Product V2
+[ ] Create Product
+[ ] Get Products
+[ ] Get Product
+[ ] Update Product
+[ ] Delete Product
+[ ] Stock APIs
+[ ] Image Upload
+[ ] Price Range
+[ ] Low Stock
+[ ] Category
+
+Shopping Cart
+[ ] Create Cart
+[ ] Get All Carts
+[ ] Get Cart
+[ ] Get Cart By Customer
+[ ] Clear Cart
+[ ] Delete Cart
+
+Cart Items
+[ ] Add Cart Item
+[ ] Get All Cart Items
+[ ] Get Cart Item
+[ ] Get Items By Cart
+[ ] Update Quantity
+[ ] Delete Cart Item
+
+Orders
+[ ] Create Order
+[ ] Get All Orders
+[ ] Get Order
+[ ] Update Order
+[ ] Delete Order
+[ ] Confirm Order
+[ ] Cancel Order
+[ ] Checkout
+[ ] Orders By Status
+[ ] Orders By Customer
+
+Order Items
+[ ] Create Order Item
+[ ] Get All Order Items
+[ ] Get Order Item
+[ ] Get Items By Order
+[ ] Update Order Item
+[ ] Delete Order Item
+
+Payments
+[ ] Create Payment
+[ ] Get All Payments
+[ ] Get Payment
+[ ] Update Payment
+[ ] Delete Payment
+[ ] Process Payment
+[ ] Payments By Status
+[ ] Payment By Order
+
+Supporting Features
+[ ] Validation
+[ ] Exception Handling
+[ ] JPQL
+[ ] Native Query
+[ ] Named Query
+[ ] Auditing
+[ ] Transactions
+[ ] Scheduler
+[ ] Logging
+[ ] Swagger
+[ ] API Versioning
+[ ] Actuator
+[ ] Image Upload
 ```
+
+---
+
+# 52. Final Goal
+
+The completed project demonstrates a complete Spring Boot e-commerce backend using:
+
+```text
 Java
 +
 Spring Boot
 +
-REST API
+Spring Web
 +
 Spring Data JPA
 +
@@ -2011,13 +2432,13 @@ Exception Handling
 +
 JPQL
 +
-Native Query
+Native SQL
 +
 Named Query
 +
-Relationships
+JPA Relationships
 +
-Enum
+Enums
 +
 Auditing
 +
@@ -2029,96 +2450,109 @@ Swagger
 +
 Logging
 +
-Versioning
+API Versioning
 +
 Actuator
 +
 Lombok
 +
 File Upload
-```
-
-The architecture should remain easy to modify when adding new business requirements.
-
-For every new module, follow the same pattern:
-```
-Entity
-  ↓
-Repository
-  ↓
-Request DTO
-  ↓
-Response DTO
-  ↓
-Service Interface
-  ↓
-Service Implementation
-  ↓
-Controller
-  ↓
-Exception Handling
-  ↓
-Swagger
-  ↓
++
 Postman Testing
-  ↓
+```
+
+The standard development pattern for new modules is:
+
+```text
+Entity
+   ↓
+Repository
+   ↓
+Request DTO
+   ↓
+Response DTO
+   ↓
+Service Interface
+   ↓
+Service Implementation
+   ↓
+Controller
+   ↓
+Exception Handling
+   ↓
+Swagger
+   ↓
+Postman Testing
+   ↓
 README Update
 ```
 
 ---
 
-# 61. Maintenance Notes
+# 53. Maintenance Notes
 
 Whenever the project is modified:
 
-1. Update the entity
-2. Update the database relationship if necessary
-3. Update Request DTO
-4. Update Response DTO
-5. Update Repository queries
-6. Update Service interface
-7. Update Service implementation
-8. Update Controller
-9. Update Swagger documentation
-10. Add/update validation
-11. Add/update exception handling
-12. Add Postman test
-13. Update this README
+1. Update the entity if required.
+2. Update database relationships if required.
+3. Update Request DTO.
+4. Update Response DTO.
+5. Update Repository queries.
+6. Update Service interface.
+7. Update Service implementation.
+8. Update Controller.
+9. Update Swagger documentation.
+10. Update validation.
+11. Update exception handling.
+12. Add/update Postman tests.
+13. Update this README.
 
-This README should be treated as the **living documentation** of the project.
+This README should be maintained as the **living documentation** of the project.
 
 ---
 
-# 62. Version History
+# 54. Version History
 
 ## Version 1.0.0
-Initial E-commerce REST API architecture.
+
+Initial E-commerce REST API implementation.
+
+**Stack:** Java 25 · Spring Boot 3.4.13 · MySQL
 
 Included:
-- Customer
-- Product
-- Order
-- OrderItem
-- ShoppingCart
-- CartItem
-- Payment
-- REST API
-- DTO architecture
-- Validation
-- Exception handling
-- JPA queries
-- Auditing
-- Transactions
-- Scheduler
-- Swagger
-- Logging
-- Versioning
-- Actuator
-- Image upload
+
+* Customer
+* Product
+* Shopping Cart
+* Cart Item
+* Order
+* Order Item
+* Payment
+* CRUD APIs
+* DTO architecture
+* Validation
+* Exception handling
+* JPQL
+* Native queries
+* Named queries
+* Entity relationships
+* Enum classes
+* JPA auditing
+* Transaction management
+* Checkout
+* Scheduler
+* Logging
+* Swagger / OpenAPI (SpringDoc 2.8.17)
+* API versioning (V1 & V2)
+* Actuator
+* Product image upload
+* Spring Boot DevTools (hot reload)
+* H2 database (test scope)
+* Postman API testing documentation
 
 ---
 
-# 63. Author / Project Information
+# 55. Author / Project Information
 
 **Project:** E-commerce REST API
 
@@ -2139,9 +2573,11 @@ Included:
 ---
 
 ## License
-This project is open-source and available for educational purposes.
+
+This project is available for educational and learning purposes.
 
 ---
 
 ## Contact & Support
-For questions or support, please refer to the project documentation or open an issue in the repository.
+
+For questions or support, refer to the project documentation or open an issue in the repository.

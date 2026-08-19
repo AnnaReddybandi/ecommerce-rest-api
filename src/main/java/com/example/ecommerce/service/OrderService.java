@@ -3,7 +3,7 @@ package com.example.ecommerce.service;
 import com.example.ecommerce.dto.order.CheckoutRequestDto;
 import com.example.ecommerce.dto.order.OrderRequestDto;
 import com.example.ecommerce.dto.order.OrderResponseDto;
-import com.example.ecommerce.entity.OrderStatus;
+import com.example.ecommerce.entity.enums.OrderStatus;
 
 import java.util.List;
 

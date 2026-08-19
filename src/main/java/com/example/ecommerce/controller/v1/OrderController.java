@@ -3,7 +3,7 @@ package com.example.ecommerce.controller.v1;
 import com.example.ecommerce.dto.order.OrderRequestDto;
 import com.example.ecommerce.dto.order.OrderResponseDto;
 import com.example.ecommerce.dto.order.CheckoutRequestDto;
-import com.example.ecommerce.entity.OrderStatus;
+import com.example.ecommerce.entity.enums.OrderStatus;
 import com.example.ecommerce.service.OrderService;
 
 import io.swagger.v3.oas.annotations.Operation;

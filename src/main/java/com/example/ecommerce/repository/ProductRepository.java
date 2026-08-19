@@ -1,9 +1,8 @@
 package com.example.ecommerce.repository;
 
 import com.example.ecommerce.entity.Product;
-import com.example.ecommerce.entity.ProductCategory;
-import com.example.ecommerce.entity.ProductStatus;
-
+import com.example.ecommerce.entity.enums.ProductCategory;
+import com.example.ecommerce.entity.enums.ProductStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -73,7 +72,7 @@ public interface ProductRepository
             SELECT p
             FROM Product p
             WHERE p.stock < :threshold
-            AND p.status = com.example.ecommerce.entity.ProductStatus.ACTIVE
+            AND p.status = 'ACTIVE'
             ORDER BY p.stock ASC
             """)
     List<Product> findLowStockProducts(
