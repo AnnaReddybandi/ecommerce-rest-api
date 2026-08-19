@@ -2,7 +2,7 @@ package com.example.ecommerce.controller.v1;
 
 import com.example.ecommerce.dto.payment.PaymentRequestDto;
 import com.example.ecommerce.dto.payment.PaymentResponseDto;
-import com.example.ecommerce.entity.PaymentStatus;
+import com.example.ecommerce.entity.enums.PaymentStatus;
 import com.example.ecommerce.service.PaymentService;
 
 import io.swagger.v3.oas.annotations.Operation;

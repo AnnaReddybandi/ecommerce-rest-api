@@ -2,7 +2,7 @@ package com.example.ecommerce.service;
 
 import com.example.ecommerce.dto.payment.PaymentRequestDto;
 import com.example.ecommerce.dto.payment.PaymentResponseDto;
-import com.example.ecommerce.entity.PaymentStatus;
+import com.example.ecommerce.entity.enums.PaymentStatus;
 
 import java.util.List;
 

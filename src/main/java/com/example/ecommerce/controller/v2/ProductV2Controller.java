@@ -2,7 +2,7 @@ package com.example.ecommerce.controller.v2;
 
 import com.example.ecommerce.dto.product.ProductRequestDto;
 import com.example.ecommerce.dto.product.ProductResponseDto;
-import com.example.ecommerce.entity.ProductCategory;
+import com.example.ecommerce.entity.enums.ProductCategory;
 import com.example.ecommerce.service.ProductService;
 
 import io.swagger.v3.oas.annotations.Operation;

@@ -3,8 +3,9 @@ package com.example.ecommerce.service.impl;
 import com.example.ecommerce.dto.product.ProductRequestDto;
 import com.example.ecommerce.dto.product.ProductResponseDto;
 import com.example.ecommerce.entity.Product;
-import com.example.ecommerce.entity.ProductCategory;
-import com.example.ecommerce.entity.ProductStatus;
+import com.example.ecommerce.entity.enums.ProductCategory;
+import com.example.ecommerce.entity.enums.ProductStatus;
+import com.example.ecommerce.exception.InsufficientStockException;
 import com.example.ecommerce.exception.ResourceNotFoundException;
 import com.example.ecommerce.repository.ProductRepository;
 import com.example.ecommerce.service.ProductService;
@@ -229,7 +230,7 @@ public class ProductServiceImpl implements ProductService {
 
         if (product.getStock() < quantity) {
 
-            throw new IllegalArgumentException(
+            throw new InsufficientStockException(
                     "Insufficient stock. Available stock: "
                             + product.getStock()
             );

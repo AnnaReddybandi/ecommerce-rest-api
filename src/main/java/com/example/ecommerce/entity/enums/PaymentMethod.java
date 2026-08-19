@@ -1,4 +1,4 @@
-package com.example.ecommerce.entity;
+package com.example.ecommerce.entity.enums;
 
 public enum PaymentMethod {
     CASH_ON_DELIVERY,

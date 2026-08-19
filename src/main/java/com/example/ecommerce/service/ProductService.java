@@ -2,7 +2,7 @@ package com.example.ecommerce.service;
 
 import com.example.ecommerce.dto.product.ProductRequestDto;
 import com.example.ecommerce.dto.product.ProductResponseDto;
-import com.example.ecommerce.entity.ProductCategory;
+import com.example.ecommerce.entity.enums.ProductCategory;
 
 import org.springframework.web.multipart.MultipartFile;
 

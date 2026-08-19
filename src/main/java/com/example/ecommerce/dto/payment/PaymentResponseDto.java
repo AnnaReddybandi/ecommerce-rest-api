@@ -1,7 +1,7 @@
 package com.example.ecommerce.dto.payment;
 
-import com.example.ecommerce.entity.PaymentMethod;
-import com.example.ecommerce.entity.PaymentStatus;
+import com.example.ecommerce.entity.enums.PaymentMethod;
+import com.example.ecommerce.entity.enums.PaymentStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

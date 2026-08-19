@@ -1,5 +1,7 @@
 package com.example.ecommerce.entity;
 
+import com.example.ecommerce.entity.enums.PaymentMethod;
+import com.example.ecommerce.entity.enums.PaymentStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;

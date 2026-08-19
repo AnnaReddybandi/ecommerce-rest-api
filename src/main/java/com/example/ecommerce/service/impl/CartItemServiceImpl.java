@@ -4,8 +4,8 @@ import com.example.ecommerce.dto.cartitem.CartItemRequestDto;
 import com.example.ecommerce.dto.cartitem.CartItemResponseDto;
 import com.example.ecommerce.entity.CartItem;
 import com.example.ecommerce.entity.Product;
-import com.example.ecommerce.entity.ProductStatus;
 import com.example.ecommerce.entity.ShoppingCart;
+import com.example.ecommerce.exception.InsufficientStockException;
 import com.example.ecommerce.exception.ResourceNotFoundException;
 import com.example.ecommerce.repository.CartItemRepository;
 import com.example.ecommerce.repository.ProductRepository;
@@ -35,8 +35,7 @@ public class CartItemServiceImpl implements CartItemService {
     // ============================================================
 
     @Override
-    public CartItemResponseDto create(
-            CartItemRequestDto request) {
+    public CartItemResponseDto create(CartItemRequestDto request) {
 
         log.info(
                 "Adding product ID {} to cart ID {}",
@@ -44,42 +43,30 @@ public class CartItemServiceImpl implements CartItemService {
                 request.cartId()
         );
 
-        ShoppingCart cart =
-                shoppingCartRepository
-                        .findById(request.cartId())
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException(
-                                        "Shopping cart not found with ID: "
-                                                + request.cartId()
-                                )
-                        );
+        // Find shopping cart
+        ShoppingCart cart = shoppingCartRepository
+                .findById(request.cartId())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Shopping cart not found with ID: "
+                                        + request.cartId()
+                        )
+                );
 
-        Product product =
-                productRepository
-                        .findById(request.productId())
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException(
-                                        "Product not found with ID: "
-                                                + request.productId()
-                                )
-                        );
+        // Find product
+        Product product = productRepository
+                .findById(request.productId())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Product not found with ID: "
+                                        + request.productId()
+                        )
+                );
 
-        // --------------------------------------------------------
-        // Check product status
-        // --------------------------------------------------------
+        // Validate requested quantity
+        validateStock(product, request.quantity());
 
-        if (product.getStatus() != ProductStatus.ACTIVE) {
-
-            throw new IllegalStateException(
-                    "Product is not active: "
-                            + product.getName()
-            );
-        }
-
-        // --------------------------------------------------------
         // Check whether product already exists in cart
-        // --------------------------------------------------------
-
         CartItem existingItem =
                 cartItemRepository
                         .findByShoppingCartIdAndProductId(
@@ -88,9 +75,9 @@ public class CartItemServiceImpl implements CartItemService {
                         )
                         .orElse(null);
 
-        // --------------------------------------------------------
-        // Existing cart item
-        // --------------------------------------------------------
+        // ========================================================
+        // PRODUCT ALREADY EXISTS IN CART
+        // ========================================================
 
         if (existingItem != null) {
 
@@ -98,20 +85,15 @@ public class CartItemServiceImpl implements CartItemService {
                     existingItem.getQuantity()
                             + request.quantity();
 
-            validateStock(
-                    product,
-                    newQuantity
-            );
+            validateStock(product, newQuantity);
 
-            existingItem.setQuantity(
-                    newQuantity
-            );
+            existingItem.setQuantity(newQuantity);
 
             CartItem savedItem =
                     cartItemRepository.save(existingItem);
 
             log.info(
-                    "Cart item quantity updated. " +
+                    "Existing cart item updated successfully. " +
                             "Cart ID: {}, Product ID: {}, Quantity: {}",
                     request.cartId(),
                     request.productId(),
@@ -121,21 +103,15 @@ public class CartItemServiceImpl implements CartItemService {
             return mapToResponse(savedItem);
         }
 
-        // --------------------------------------------------------
-        // New cart item
-        // --------------------------------------------------------
+        // ========================================================
+        // NEW CART ITEM
+        // ========================================================
 
-        validateStock(
-                product,
-                request.quantity()
-        );
+        CartItem cartItem = new CartItem();
 
-        CartItem cartItem =
-                new CartItem(
-                        cart,
-                        product,
-                        request.quantity()
-                );
+        cartItem.setShoppingCart(cart);
+        cartItem.setProduct(product);
+        cartItem.setQuantity(request.quantity());
 
         CartItem savedItem =
                 cartItemRepository.save(cartItem);
@@ -149,7 +125,7 @@ public class CartItemServiceImpl implements CartItemService {
     }
 
     // ============================================================
-    // GET ALL
+    // GET ALL CART ITEMS
     // ============================================================
 
     @Override
@@ -158,21 +134,19 @@ public class CartItemServiceImpl implements CartItemService {
 
         log.info("Fetching all cart items");
 
-        return cartItemRepository
-                .findAll()
+        return cartItemRepository.findAll()
                 .stream()
                 .map(this::mapToResponse)
                 .toList();
     }
 
     // ============================================================
-    // GET BY ID
+    // GET CART ITEM BY ID
     // ============================================================
 
     @Override
     @Transactional(readOnly = true)
-    public CartItemResponseDto getById(
-            Long id) {
+    public CartItemResponseDto getById(Long id) {
 
         log.info(
                 "Fetching cart item with ID: {}",
@@ -180,8 +154,7 @@ public class CartItemServiceImpl implements CartItemService {
         );
 
         CartItem cartItem =
-                cartItemRepository
-                        .findById(id)
+                cartItemRepository.findById(id)
                         .orElseThrow(() ->
                                 new ResourceNotFoundException(
                                         "Cart item not found with ID: "
@@ -193,19 +166,19 @@ public class CartItemServiceImpl implements CartItemService {
     }
 
     // ============================================================
-    // GET BY CART ID
+    // GET CART ITEMS BY CART ID
     // ============================================================
 
     @Override
     @Transactional(readOnly = true)
-    public List<CartItemResponseDto> getByCartId(
-            Long cartId) {
+    public List<CartItemResponseDto> getByCartId(Long cartId) {
 
         log.info(
                 "Fetching cart items for cart ID: {}",
                 cartId
         );
 
+        // Verify shopping cart exists
         if (!shoppingCartRepository.existsById(cartId)) {
 
             throw new ResourceNotFoundException(
@@ -222,7 +195,7 @@ public class CartItemServiceImpl implements CartItemService {
     }
 
     // ============================================================
-    // UPDATE QUANTITY
+    // UPDATE CART ITEM QUANTITY
     // ============================================================
 
     @Override
@@ -236,8 +209,7 @@ public class CartItemServiceImpl implements CartItemService {
         );
 
         CartItem cartItem =
-                cartItemRepository
-                        .findById(id)
+                cartItemRepository.findById(id)
                         .orElseThrow(() ->
                                 new ResourceNotFoundException(
                                         "Cart item not found with ID: "
@@ -245,12 +217,11 @@ public class CartItemServiceImpl implements CartItemService {
                                 )
                         );
 
-        // --------------------------------------------------------
-        // Prevent changing cart
-        // --------------------------------------------------------
+        // ========================================================
+        // PREVENT CART CHANGE
+        // ========================================================
 
-        if (!cartItem
-                .getShoppingCart()
+        if (!cartItem.getShoppingCart()
                 .getId()
                 .equals(request.cartId())) {
 
@@ -259,12 +230,11 @@ public class CartItemServiceImpl implements CartItemService {
             );
         }
 
-        // --------------------------------------------------------
-        // Prevent changing product
-        // --------------------------------------------------------
+        // ========================================================
+        // PREVENT PRODUCT CHANGE
+        // ========================================================
 
-        if (!cartItem
-                .getProduct()
+        if (!cartItem.getProduct()
                 .getId()
                 .equals(request.productId())) {
 
@@ -273,29 +243,20 @@ public class CartItemServiceImpl implements CartItemService {
             );
         }
 
-        Product product =
-                cartItem.getProduct();
+        Product product = cartItem.getProduct();
 
-        // --------------------------------------------------------
-        // Validate product status
-        // --------------------------------------------------------
-
-        if (product.getStatus() != ProductStatus.ACTIVE) {
-
-            throw new IllegalStateException(
-                    "Product is not active: "
-                            + product.getName()
-            );
-        }
-
-        // --------------------------------------------------------
-        // Validate stock
-        // --------------------------------------------------------
+        // ========================================================
+        // VALIDATE STOCK
+        // ========================================================
 
         validateStock(
                 product,
                 request.quantity()
         );
+
+        // ========================================================
+        // UPDATE QUANTITY
+        // ========================================================
 
         cartItem.setQuantity(
                 request.quantity()
@@ -313,7 +274,7 @@ public class CartItemServiceImpl implements CartItemService {
     }
 
     // ============================================================
-    // DELETE
+    // DELETE CART ITEM
     // ============================================================
 
     @Override
@@ -325,8 +286,7 @@ public class CartItemServiceImpl implements CartItemService {
         );
 
         CartItem cartItem =
-                cartItemRepository
-                        .findById(id)
+                cartItemRepository.findById(id)
                         .orElseThrow(() ->
                                 new ResourceNotFoundException(
                                         "Cart item not found with ID: "
@@ -359,7 +319,7 @@ public class CartItemServiceImpl implements CartItemService {
 
         if (product.getStock() < quantity) {
 
-            throw new IllegalArgumentException(
+            throw new InsufficientStockException(
                     "Insufficient stock for product: "
                             + product.getName()
                             + ". Available stock: "
@@ -376,29 +336,13 @@ public class CartItemServiceImpl implements CartItemService {
             CartItem cartItem) {
 
         return new CartItemResponseDto(
-
                 cartItem.getId(),
-
-                cartItem
-                        .getShoppingCart()
-                        .getId(),
-
-                cartItem
-                        .getProduct()
-                        .getId(),
-
-                cartItem
-                        .getProduct()
-                        .getName(),
-
+                cartItem.getShoppingCart().getId(),
+                cartItem.getProduct().getId(),
+                cartItem.getProduct().getName(),
                 cartItem.getQuantity(),
-
-                cartItem
-                        .getProduct()
-                        .getPrice(),
-
+                cartItem.getProduct().getPrice(),
                 cartItem.getCreatedAt(),
-
                 cartItem.getUpdatedAt()
         );
     }

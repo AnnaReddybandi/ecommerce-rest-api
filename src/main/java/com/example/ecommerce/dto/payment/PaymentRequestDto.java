@@ -1,6 +1,6 @@
 package com.example.ecommerce.dto.payment;
 
-import com.example.ecommerce.entity.PaymentMethod;
+import com.example.ecommerce.entity.enums.PaymentMethod;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 
